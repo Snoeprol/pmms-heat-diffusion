@@ -1,6 +1,5 @@
 #include "compute.h"
 #include "input.h"
-#include "input.c"
 
 int main(int argc, char **argv)
 {

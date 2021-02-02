@@ -91,48 +91,45 @@ void do_compute(const struct parameters *p, struct results *r)
             (start.tv_sec + (start.tv_usec / 1000000.0));
     fprintf(stderr, "\n Simulation took %.3f seconds\n", rtime);
 
-    printf("Value in next is: %f\n", &current[4][4]);
+    compute_results(&p, r, 0, M, N, &current, rtime);
 
-    compute_results(&p, &r, 0, (double*) current, rtime);
+
+
 }
 
-void compute_results(const struct parameters *p, struct results *r, int k, double **t_array, double rtime) {
+void compute_results(const struct parameters *p, struct results *r, int k, int M, int N,  double t_array[N][M], double rtime) {
     r->niter = k;
-    int M = p->M;
-    int N = p->N;
-    double tmin = __INT_MAX__;
-    double tmax = -(__INT_MAX__);
+    double tmin = 10E8;
+    double tmax = -10E8;
     double t_tot = 0;
     double max_diff = 0;
 
-
-
-    printf("Result function received: %f\n", &t_array[4][4]);
-    // for (int i = 0; i < N; i++)
-    // {
-    //     for (int j = 1; j < M - 1; j++)
-    //     {
-    //         printf("%f\n", &t_array[i][j]);
-    //         // t_tot += t_array[i][j];
-    //         // if (t_array[i][j] > tmax)
-    //         //     tmax = t_array[i][j];
-    //         // if (t_array[i][j] < tmin)
-    //         //     tmin = t_array[i][j];
-    //         // for (int k = 0; i < N; i++)
-    //         // {
-    //         //     for (int l = 1; j < M - 1; j++)
-    //         //     {
-    //         //         if (abs(t_array[i][j] - t_array[k][l]) > max_diff)
-    //         //             max_diff = abs(t_array[i][j] - t_array[k][l]);
-    //         //     }
-    //         // }
-    //     }
-    // }
-    // r->time = rtime;
-    // r->niter = k;
-    // r->tmin = tmin;
-    // r->tmax = tmax;
-    // r->tavg = t_tot / N * M;
-    // r->maxdiff = max_diff;
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 1; j < M - 1; j++)
+        {
+            double current_value = t_array[i][j];
+            t_tot += t_array[i][j];
+            if (current_value > tmax)
+                tmax = current_value;
+            if (current_value < tmin)
+                tmin = current_value;
+            for (int k = 0; k < N; k++)
+            {
+                for (int l = 1; l < M - 1; l++)
+                {
+                    double current_value_2 = t_array[k][l];
+                    if (abs(current_value - current_value_2) > max_diff)
+                        max_diff = abs(current_value - current_value_2);
+                }
+            }
+        }
+    }
+    r->time = rtime;
+    r->niter = k;
+    r->tmin = tmin;
+    r->tmax = tmax;
+    r->tavg = t_tot / N * M;
+    r->maxdiff = max_diff;
 }
 
