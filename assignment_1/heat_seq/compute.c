@@ -17,8 +17,8 @@ struct timeval end;
 // assume bound is the boundary value array (size (N, 2)) bound[x][0] is bottom
 
 /* Define weak strong influences */
-const double weak_inf = 1 / 4 * (sqrt(2) + 1);
-const double strong_inf = sqrt(2) / 4 * (sqrt(2) + 1);
+const double weak_inf = 1 / (4 * (sqrt(2) + 1));
+const double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
 
 void do_compute(const struct parameters *p, struct results *r)
 {
@@ -33,14 +33,35 @@ void do_compute(const struct parameters *p, struct results *r)
     double **output_t;
 
     /* Fill next and conductivity as 2D matrix */
+
+    double min = -100000;
+    double max = 100000;
+    
     for (size_t i = 0; i < N; i++)
     {
         for (size_t j = 0; j < M; j++)
-        {
-            next[i][j] = p->tinit[(i + 1) * j];
-            cond[i][j] = p->conductivity[(i + 1) * j];
+        {   
+            next[i][j] = p->tinit[i * M + j];
+            cond[i][j] = p->conductivity[i * M + j];
+            //printf("%.2f\n", next[i][j]);
+            if (p->tinit[(i + 1) * j] > max)
+                max = p->tinit[(i + 1) * j];
+            if (p->tinit[(i + 1) * j] < min)
+                min = p->tinit[(i + 1) * j];
         }
     }
+    printf("max: %.2f\n", max);
+    printf("min: %.2f\n", min);
+    /* Get a sexy pic */
+    begin_picture (0 , p->M , p->N , 40 , 100);
+    for (size_t i = 0; i < N; i++)
+    {
+            for (size_t j = 0; j < M; j++)
+            {
+                draw_point (i , j , next[i][j]);
+            }
+        }
+    end_picture();
 
     /* Get start time */
     if (gettimeofday(&start, 0) != 0)
@@ -60,9 +81,11 @@ void do_compute(const struct parameters *p, struct results *r)
         {
             for (int j = 1; j < M - 1; j++)
             {
+                //printf("next \n---->%.2f\n", current[i][j]);
+                //printf("---->%.2f\n", next[i][j]);
                 /* Make sure were not on top or bottom boundary */
                 next[i][j] = cond[i][j] * current[i][j];
-                double inf = 1 - cond[i][j];
+                double inf = (1 - cond[i][j]);
 
                 // printf("%f ", next[i][j]);
 
@@ -91,9 +114,18 @@ void do_compute(const struct parameters *p, struct results *r)
             (start.tv_sec + (start.tv_usec / 1000000.0));
     fprintf(stderr, "\n Simulation took %.3f seconds\n", rtime);
 
-    compute_results(&p, r, 0, M, N, &current, rtime);
+    compute_results(&p, r, p->maxiter, M, N, &current, rtime);
 
-
+    /* Get a sexy pic */
+    begin_picture (42 , p->M , p->N , r->tmin , r->tmax);
+    for (size_t i = 0; i < N; i++)
+    {
+            for (size_t j = 0; j < M; j++)
+            {
+                draw_point (i , j , current[i][j]);
+            }
+        }
+    end_picture();
 
 }
 
@@ -114,6 +146,8 @@ void compute_results(const struct parameters *p, struct results *r, int k, int M
                 tmax = current_value;
             if (current_value < tmin)
                 tmin = current_value;
+
+            /* Logic for max_diff */
             for (int k = 0; k < N; k++)
             {
                 for (int l = 1; l < M - 1; l++)
@@ -129,7 +163,7 @@ void compute_results(const struct parameters *p, struct results *r, int k, int M
     r->niter = k;
     r->tmin = tmin;
     r->tmax = tmax;
-    r->tavg = t_tot / N * M;
+    r->tavg = t_tot / (N * M);
     r->maxdiff = max_diff;
 }
 
