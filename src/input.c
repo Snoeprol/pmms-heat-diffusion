@@ -79,12 +79,12 @@ void read_parameters(struct parameters* p, int argc, char **argv)
     p->N = 150;
     p->M = 100;
     p->maxiter = 42;
-    p->period = 1000;
+    p->period = 10;
     p->threshold = 0.1;
-    p->io_tmin = -100.0;
+    p->io_tmin = 0.0;
     p->io_tmax = 100.0;
     p->nthreads = 1;
-    p->printreports = 0;
+    p->printreports = 1;
     conductivity_fname = "../../images/pat1_100x150.pgm";
     tinit_fname = "../../images/pat1_100x150.pgm";
 
