@@ -10,7 +10,5 @@ int main(int argc, char **argv)
 
     do_compute(&p, &r);
 
-    report_results(&p, &r);
-
     return 0;
 }
