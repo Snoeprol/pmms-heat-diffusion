@@ -39,7 +39,7 @@ void do_compute(const struct parameters *p, struct results *r)
 
     double min = 10E10;
     double max = -10E10;
-    
+
     for (size_t i = 1; i < N + 1; i++)
     {
         for (size_t j = 0; j < M; j++)
@@ -53,7 +53,7 @@ void do_compute(const struct parameters *p, struct results *r)
                 next[N + 1][j] = p->tinit[(i-1) * M + j];
             }
             next[i][j] = p->tinit[(i-1) * M + j];
-            cond[i][j] = p->conductivity[(i - 1) * M + j];
+            cond[i][j] = 0;//p->conductivity[(i - 1) * M + j];
             //printf("%.2f\n", cond[i][j]);
             //printf("%.2f\n", next[i][j]);
             
@@ -118,20 +118,22 @@ void do_compute(const struct parameters *p, struct results *r)
             }
         }
         */
-        //compute_results(&p, r, step, M, N, &current, rtime);
+        /* make movie */
+        begin_picture (step + 1 , p->M , p->N , p->io_tmin , p->io_tmax);
+        for (size_t i = 1; i < N + 1; i++)
+        {
+                for (size_t j = 0; j < M; j++)
+                {
+                    draw_point (j , i - 1, next[i][j]);
+                }
+            }
+        end_picture();
         for (int i = 1; i < N + 1; i++)
         {
             for (int j = 0; j < M; j++)
             {
-                //printf("next \n---->%.2f\n", current[i][j]);
-                //printf("---->%.2f\n", next[i][j]);
-                /* Make sure were not on top or bottom boundary */
-                if (next[i][j] > 10000)
-                    printf("%.5f \n", next[i][j]);
                 next[i][j] = cond[i][j] * current[i][j];
                 double inf = (1 - cond[i][j]);
-
-                // printf("%f ", next[i][j]);
 
                 /* strong neighbors */
                 next[i][j] += strong_inf * inf * current[(i + 1) % N][j];
@@ -144,7 +146,6 @@ void do_compute(const struct parameters *p, struct results *r)
                 next[i][j] += weak_inf * inf * current[(i + 1) % N][j - 1];
                 next[i][j] += weak_inf * inf * current[(i - 1 + N) % N][j + 1];
                 next[i][j] += weak_inf * inf * current[(i + 1) % N][j + 1];
-
             }
         }
     }
@@ -183,8 +184,8 @@ void compute_results(const struct parameters *p, struct results *r, int k, int M
     {
         for (int j = 0; j < M; j++)
         {
-            double current_value = t_array[i][j];
-            t_tot += t_array[i][j];
+            double current_value = t_array_new[i][j];
+            t_tot += t_array_new[i][j];
             if (current_value > tmax)
                 tmax = current_value;
             if (current_value < tmin)
@@ -206,11 +207,8 @@ void compute_results(const struct parameters *p, struct results *r, int k, int M
 void check_convergence(int num_bodies, double * t_current, double * t_next, double epsilon){
     for (int i = 0; i < num_bodies; i++)
     {
-        for (int j = 1; j < num_bodies; j++)
-        {
-            if (fabs(t_current[i] - t_next[j]) < epsilon)
-                return 1;
-        }
+        if (fabs(t_current[i] - t_next[i]) < epsilon)
+            return 1;
     }    
     return 0;
 }
