@@ -7,6 +7,7 @@
 #include <time.h>
 #include <output.h>
 #include <string.h>
+
 double rtime;
 struct timeval start;
 struct timeval end;
@@ -43,7 +44,7 @@ void do_compute(const struct parameters *p, struct results *r)
     for (size_t i = 1; i < N + 1; i++)
     {
         for (size_t j = 0; j < M; j++)
-        {   
+        {
             if (i == 1)
             {
                 next[0][j] = p->tinit[(i-1) * M + j];
@@ -54,7 +55,7 @@ void do_compute(const struct parameters *p, struct results *r)
             }
             next[i][j] = p->tinit[(i-1) * M + j];
             cond[i][j] = p->conductivity[(i - 1) * M + j];
-            
+
             if (p->tinit[(i - 1) * j] > max)
                 max = p->tinit[(i - 1) * j];
             if (p->tinit[(i) * j] < min)
@@ -96,17 +97,17 @@ void do_compute(const struct parameters *p, struct results *r)
                 double inf = (1 - cond[i][j]);
 
                 /* strong neighbors */
-                next[i][j] += strong_inf * inf * current[(i + 1) % N][j];
-                next[i][j] += strong_inf * inf * current[(i - 1 + N) % N][j];
-                next[i][j] += strong_inf * inf * current[i][j + 1];
-                next[i][j] += strong_inf * inf * current[i][j - 1];
+                next[i][j] += strong_inf * inf * current[(i + 1)][j];
+                next[i][j] += strong_inf * inf * current[(i - 1)][j];
+                next[i][j] += strong_inf * inf * current[i][(j + 1) % M];
+                next[i][j] += strong_inf * inf * current[i][(j - 1 + M) % M];
 
                 /* weak neighbors */
-                next[i][j] += weak_inf * inf * current[(i - 1 + N) % N][j - 1];
-                next[i][j] += weak_inf * inf * current[(i + 1) % N][j - 1];
-                next[i][j] += weak_inf * inf * current[(i - 1 + N) % N][j + 1];
-                next[i][j] += weak_inf * inf * current[(i + 1) % N][j + 1];
-                
+                next[i][j] += weak_inf * inf * current[(i - 1)][(j - 1 + M) % M];
+                next[i][j] += weak_inf * inf * current[(i + 1)][(j - 1 + M) % M];
+                next[i][j] += weak_inf * inf * current[(i - 1)][(j + 1) % M];
+                next[i][j] += weak_inf * inf * current[(i + 1)][(j + 1) % M];
+
             }
         }
     }
