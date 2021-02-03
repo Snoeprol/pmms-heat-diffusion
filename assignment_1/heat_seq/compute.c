@@ -2,16 +2,11 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 #include <input.h>
 #include <time.h>
 #include <output.h>
 #include <string.h>
 #include <limits.h>
-
-double rtime;
-struct timeval start;
-struct timeval end;
 
 /* Define weak strong influences */
 const double weak_inf = 1 / (4 * (sqrt(2) + 1));
@@ -19,6 +14,9 @@ const double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
 
 void do_compute(const struct parameters *p, struct results *r)
 {
+    double rtime;
+    struct timeval start;
+    struct timeval end;
     int M = p->M;
     int N = p->N;
     int num_bodies = M * (N + 2);
@@ -93,11 +91,11 @@ void do_compute(const struct parameters *p, struct results *r)
 void compute_results(const struct parameters *p, struct results *r, int k, int M, int N, double t_array[N][M], double t_array_new[N][M], double rtime)
 {
     r->niter = k;
-    double tmin = 10E10;
-    double tmax = -10E10;
+    double tmin = LONG_MAX;
+    double tmax = LONG_MIN;
     double t_tot = 0;
     double max_diff = 0;
-    double current_value;
+    double current_value = 0.;
 
     for (int i = 1; i < N + 1; i++)
     {
@@ -106,6 +104,10 @@ void compute_results(const struct parameters *p, struct results *r, int k, int M
             /* Get current value first, as this is faster than calling the array again */
             current_value = t_array_new[i][j];
             t_tot += current_value;
+            // TODO why does this not work?
+            // tmax = fmax(tmax, current_value);
+            // tmin = fmin(tmin, current_value);
+            // printf("%f\n", fmin(4., 2.));
             if (current_value > tmax)
                 tmax = current_value;
             if (current_value < tmin)
