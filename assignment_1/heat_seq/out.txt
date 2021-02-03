@@ -15,8 +15,8 @@ Reading PGM data from ../../images/pat1_100x150.pgm...
 0.00, 100.00max: 94.90
 min: 45.10
 Creating image file: img.0000000000.pgm... done.
-º¹¹¹¹¹R@y{Creating image file: img.0000000042.pgm... done.
+Creating image file: img.0000000042.pgm... done.
 Output:
 
    Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
-42             4.547329e+01  9.490188e+01  1.467056e-01  5.050362e+01  5.420923e-03  1.406218e+09
+42             4.649549e+01  9.490188e+01  1.467056e-01  5.149283e+01  1.745081e-02  4.368279e+08

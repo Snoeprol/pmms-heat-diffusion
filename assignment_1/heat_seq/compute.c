@@ -32,14 +32,14 @@ void do_compute(const struct parameters *p, struct results *r)
     /* Create arrays for next and current bodies and conductivities */
     double next[N + 2][M];
     double current[N + 2][M];
-    double cond[N][M];
+    double cond[N + 2][M];
     double **output_t;
 
     /* Fill next and conductivity as 2D matrix */
 
     double min = 10E10;
     double max = -10E10;
-    //printf("%.5f\n", p->tinit[150 * M + 0]);
+    
     for (size_t i = 1; i < N + 1; i++)
     {
         for (size_t j = 0; j < M; j++)
@@ -53,25 +53,23 @@ void do_compute(const struct parameters *p, struct results *r)
                 next[N + 1][j] = p->tinit[(i-1) * M + j];
             }
             next[i][j] = p->tinit[(i-1) * M + j];
-            cond[i][j] = p->conductivity[(i-1) * M + j];
+            cond[i][j] = p->conductivity[(i - 1) * M + j];
             //printf("%.2f\n", cond[i][j]);
             //printf("%.2f\n", next[i][j]);
             
-            if (p->tinit[(i) * j] > max)
-                max = p->tinit[(i) * j];
+            if (p->tinit[(i - 1) * j] > max)
+                max = p->tinit[(i - 1) * j];
             if (p->tinit[(i) * j] < min)
-                min = p->tinit[(i) * j];
+                min = p->tinit[(i - 1) * j];
         }
     }
-    { 
     /*
     for (int i = 0; i < N + 2; i++) { 
         for (int j = 0; j < M; j++) {
                 printf("Value for [%d][%d] is %.5f: \n",i,j, next[i][j]); 
         } 
     } 
-    */
-    } 
+    */ 
 
     printf("max: %.2f\n", max);
     printf("min: %.2f\n", min);
@@ -89,7 +87,7 @@ void do_compute(const struct parameters *p, struct results *r)
 
     /* Get a sexy pic */
     begin_picture (0 , p->M , p->N , p->io_tmin , p->io_tmax);
-    for (size_t i = 1; i < N; i++)
+    for (size_t i = 1; i < N + 1; i++)
     {
             for (size_t j = 0; j < M; j++)
             {
@@ -128,6 +126,8 @@ void do_compute(const struct parameters *p, struct results *r)
                 //printf("next \n---->%.2f\n", current[i][j]);
                 //printf("---->%.2f\n", next[i][j]);
                 /* Make sure were not on top or bottom boundary */
+                if (next[i][j] > 10000)
+                    printf("%.5f \n", next[i][j]);
                 next[i][j] = cond[i][j] * current[i][j];
                 double inf = (1 - cond[i][j]);
 
@@ -148,7 +148,6 @@ void do_compute(const struct parameters *p, struct results *r)
             }
         }
     }
-
     /* Get end time and print the duration */
     if (gettimeofday(&end, 0) != 0)
     {
@@ -162,7 +161,7 @@ void do_compute(const struct parameters *p, struct results *r)
 
     /* Get a sexy pic */
     begin_picture (42 , p->M , p->N , p->io_tmin , p->io_tmax);
-    for (size_t i = 1; i < N; i++)
+    for (size_t i = 1; i < N + 1; i++)
     {
             for (size_t j = 0; j < M; j++)
             {
@@ -180,7 +179,7 @@ void compute_results(const struct parameters *p, struct results *r, int k, int M
     double t_tot = 0;
     double max_diff = 0;
 
-    for (int i = 0; i < N; i++)
+    for (int i = 1; i < N + 1; i++)
     {
         for (int j = 0; j < M; j++)
         {
