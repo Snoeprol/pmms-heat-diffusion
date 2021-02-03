@@ -28,7 +28,7 @@ void do_compute(const struct parameters *p, struct results *r)
     int period = p->period;
     double tmin = p->io_tmin;
     double tmax = p->io_tmax;
-    printf("%.2f, %.2f", tmin, tmax);
+
     /* Create arrays for next and current bodies and conductivities */
     double next[N + 2][M];
     double current[N + 2][M];
@@ -53,9 +53,7 @@ void do_compute(const struct parameters *p, struct results *r)
                 next[N + 1][j] = p->tinit[(i-1) * M + j];
             }
             next[i][j] = p->tinit[(i-1) * M + j];
-            cond[i][j] = 0;//p->conductivity[(i - 1) * M + j];
-            //printf("%.2f\n", cond[i][j]);
-            //printf("%.2f\n", next[i][j]);
+            cond[i][j] = p->conductivity[(i - 1) * M + j];
             
             if (p->tinit[(i - 1) * j] > max)
                 max = p->tinit[(i - 1) * j];
@@ -63,38 +61,9 @@ void do_compute(const struct parameters *p, struct results *r)
                 min = p->tinit[(i - 1) * j];
         }
     }
-    /*
-    for (int i = 0; i < N + 2; i++) { 
-        for (int j = 0; j < M; j++) {
-                printf("Value for [%d][%d] is %.5f: \n",i,j, next[i][j]); 
-        } 
-    } 
-    */ 
 
     printf("max: %.2f\n", max);
     printf("min: %.2f\n", min);
-
-    /* Do results have to be transformed from range 0-100?
-    for (size_t i = 0; i < N; i++)
-    {
-        for (size_t j = 0; j < M; j++)
-        {   
-            next[i][j] = tmin + (next[i][j] - min)/ (max - min) * (tmax - tmin);
-            //printf("%.2f\n", next[i][j]);
-        }
-    }
-    */
-
-    /* Get a sexy pic */
-    begin_picture (0 , p->M , p->N , p->io_tmin , p->io_tmax);
-    for (size_t i = 1; i < N + 1; i++)
-    {
-            for (size_t j = 0; j < M; j++)
-            {
-                draw_point (j , i - 1, next[i][j]);
-            }
-        }
-    end_picture();
 
     /* Get start time */
     if (gettimeofday(&start, 0) != 0)
@@ -108,16 +77,6 @@ void do_compute(const struct parameters *p, struct results *r)
     {
         /* Copy next into current */
         memcpy(current, next, sizeof(double) * num_bodies);
-        /* Check if copy works
-        int i;
-        int j ;
-        for(i=0;i<N+2;i++){
-            for(j=0;j<M;j++){
-            if(current[i][j]!=next[i][j])
-                printf("copy failed %.5f and %.5f\n", current[i][j], next[i][j]);
-            }
-        }
-        */
         /* make movie */
         begin_picture (step + 1 , p->M , p->N , p->io_tmin , p->io_tmax);
         for (size_t i = 1; i < N + 1; i++)
@@ -128,6 +87,7 @@ void do_compute(const struct parameters *p, struct results *r)
                 }
             }
         end_picture();
+
         for (int i = 1; i < N + 1; i++)
         {
             for (int j = 0; j < M; j++)
@@ -146,6 +106,7 @@ void do_compute(const struct parameters *p, struct results *r)
                 next[i][j] += weak_inf * inf * current[(i + 1) % N][j - 1];
                 next[i][j] += weak_inf * inf * current[(i - 1 + N) % N][j + 1];
                 next[i][j] += weak_inf * inf * current[(i + 1) % N][j + 1];
+                
             }
         }
     }
@@ -160,23 +121,12 @@ void do_compute(const struct parameters *p, struct results *r)
     fprintf(stderr, "\n Simulation took %.3f seconds\n", rtime);
     compute_results(&p, r, p->maxiter, M, N, &current, &next, rtime);
 
-    /* Get a sexy pic */
-    begin_picture (42 , p->M , p->N , p->io_tmin , p->io_tmax);
-    for (size_t i = 1; i < N + 1; i++)
-    {
-            for (size_t j = 0; j < M; j++)
-            {
-                draw_point (j , i - 1, next[i][j]);
-            }
-        }
-    end_picture();
-
 }
 
 void compute_results(const struct parameters *p, struct results *r, int k, int M, int N,  double t_array[N][M], double t_array_new[N][M], double rtime) {
     r->niter = k;
-    double tmin = 10E8;
-    double tmax = -10E8;
+    double tmin = 10E10;
+    double tmax = -10E10;
     double t_tot = 0;
     double max_diff = 0;
 
@@ -202,13 +152,4 @@ void compute_results(const struct parameters *p, struct results *r, int k, int M
     r->tmax = tmax;
     r->tavg = t_tot / (N * M);
     r->maxdiff = max_diff;
-}
-
-void check_convergence(int num_bodies, double * t_current, double * t_next, double epsilon){
-    for (int i = 0; i < num_bodies; i++)
-    {
-        if (fabs(t_current[i] - t_next[i]) < epsilon)
-            return 1;
-    }    
-    return 0;
 }
