@@ -7,10 +7,12 @@
 #include <output.h>
 #include <string.h>
 #include <limits.h>
+#include "nmmintrin.h" // for SSE4.2
+#include "immintrin.h" // for AVX  //TODO figure out which one
 
 /* Define weak strong influences */
-const double weak_inf = 1 / (4 * (sqrt(2) + 1));
-const double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
+double weak_inf = 1 / (4 * (sqrt(2) + 1));
+double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
 
 void do_compute(const struct parameters *p, struct results *r)
 {
@@ -64,28 +66,48 @@ void do_compute(const struct parameters *p, struct results *r)
                 next[i][j] = cond[i][j] * current[i][j];
                 double inf = (1 - cond[i][j]);
 
-                /* strong neighbors */
-                next[i][j] += strong_inf * inf * current[(i + 1)][j];
-                next[i][j] += strong_inf * inf * current[(i - 1)][j];
-                next[i][j] += strong_inf * inf * current[i][(j + 1) % M];
-                next[i][j] += strong_inf * inf * current[i][(j - 1 + M) % M];
+                double total_inf_strong = strong_inf * inf;
+                double total_inf_weak = weak_inf * inf;
 
+                const __m128 strong_scalar = _mm_set1_ps(total_inf_strong);
+                const __m128 weak_scalar = _mm_set1_ps(total_inf_weak);
+                __m128 myVector1 = _mm_set_ps(current[(i + 1)][j], current[(i - 1)][j], current[i][(j + 1) % M], current[i][(j - 1 + M) % M]);
+                __m128 outcome = _mm_mul_ps(myVector1, strong_scalar);
+                float result_strong[4];
+                _mm_store_ps(result_strong, outcome);
+
+                myVector1 = _mm_set_ps(current[(i - 1)][(j - 1 + M) % M], current[(i + 1)][(j - 1 + M) % M], current[(i - 1)][(j + 1) % M], current[(i + 1)][(j + 1) % M]);
+                outcome = _mm_mul_ps(myVector1, weak_scalar);
+                float result_weak[4];
+                _mm_store_ps(result_weak, outcome);
+
+                for (int k = 0; k < 4; k++)
+                {
+                    next[i][j] += result_strong[k];
+                    next[i][j] += result_weak[k];
+                }
+                // printf("before next[i][j] = %f\n", next[i][j]);
+                // next[i][j] += strong_inf * inf * current[(i + 1)][j];
+                // next[i][j] += strong_inf * inf * current[(i - 1)][j];
+                // next[i][j] += strong_inf * inf * current[i][(j + 1) % M];
+                // next[i][j] += strong_inf * inf * current[i][(j - 1 + M) % M];
+                // printf("after next[i][j] = %f\n", next[i][j]);
                 /* weak neighbors */
-                next[i][j] += weak_inf * inf * current[(i - 1)][(j - 1 + M) % M];
-                next[i][j] += weak_inf * inf * current[(i + 1)][(j - 1 + M) % M];
-                next[i][j] += weak_inf * inf * current[(i - 1)][(j + 1) % M];
-                next[i][j] += weak_inf * inf * current[(i + 1)][(j + 1) % M];
+                // next[i][j] += weak_inf * inf * current[(i - 1)][(j - 1 + M) % M];
+                // next[i][j] += weak_inf * inf * current[(i + 1)][(j - 1 + M) % M];
+                // next[i][j] += weak_inf * inf * current[(i - 1)][(j + 1) % M];
+                // next[i][j] += weak_inf * inf * current[(i + 1)][(j + 1) % M];
             }
         }
-    if ((step + 1) % p->printreports == 0|| p->maxiter - 1 == step)
-    {
-        /* Get end time and print intermediate step */
-        gettimeofday(&end, 0);
-        rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
-                (start.tv_sec + (start.tv_usec / 1000000.0));
-        compute_results(&p, r, step + 1, M, N, &current, &next, rtime);
-        report_results(&p, r);
-    }
+        if ((step + 1) % p->printreports == 0 || p->maxiter - 1 == step)
+        {
+            /* Get end time and print intermediate step */
+            gettimeofday(&end, 0);
+            rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
+                    (start.tv_sec + (start.tv_usec / 1000000.0));
+            compute_results(&p, r, step + 1, M, N, &current, &next, rtime);
+            report_results(&p, r);
+        }
     }
 }
 
