@@ -1,9 +1,9 @@
 #include <time.h>
-#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <input.h>
 #include <time.h>
+#include <math.h>
 #include <output.h>
 #include <string.h>
 #include <limits.h>
@@ -55,9 +55,10 @@ void do_compute(const struct parameters *p, struct results *r)
     {
         /* Copy next into current */
         memcpy(current, next, sizeof(double) * num_bodies);
-
+        // #pragma GCC ivdep
         for (int i = 1; i < N + 1; i++)
         {
+            // #pragma GCC ivdep
             for (int j = 0; j < M; j++)
             {
                 next[i][j] = cond[i][j] * current[i][j];
@@ -97,17 +98,15 @@ void compute_results(const struct parameters *p, struct results *r, int k, int M
     double max_diff = 0;
     double current_value = 0.;
 
+    // #pragma GCC ivdep
     for (int i = 1; i < N + 1; i++)
     {
+        // #pragma GCC ivdep
         for (int j = 0; j < M; j++)
         {
             /* Get current value first, as this is faster than calling the array again */
             current_value = t_array_new[i][j];
             t_tot += current_value;
-            // TODO why does this not work?
-            // tmax = fmax(tmax, current_value);
-            // tmin = fmin(tmin, current_value);
-            // printf("%f\n", fmin(4., 2.));
             if (current_value > tmax)
                 tmax = current_value;
             if (current_value < tmin)
