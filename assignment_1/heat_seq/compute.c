@@ -58,8 +58,8 @@ void do_compute(const struct parameters *p, struct results *r)
     double inf;
 
     /* Init vectors */
-    __m512d neigh_vec;
-    __m512d scalar;
+    // __m512d neigh_vec;
+    // __m512d scalar;
     
     /* Start timesteps */
     for (int step = 0; step < p->maxiter; ++step)
@@ -72,36 +72,36 @@ void do_compute(const struct parameters *p, struct results *r)
             // #pragma GCC ivdep
             for (int j = 0; j < M; j++)
             {
-                next[i][j] = cond[i][j] * current[i][j];
-                inf = (1 - cond[i][j]);
+                // next[i][j] = cond[i][j] * current[i][j];
+                // inf = (1 - cond[i][j]);
 
-                total_inf_strong = strong_inf * inf;
-                total_inf_weak = weak_inf * inf;
-                /* 512 vector */
-                scalar = _mm512_set_pd(total_inf_strong 
-                                    ,total_inf_strong
-                                    ,total_inf_strong
-                                    ,total_inf_strong
-                                    ,total_inf_weak
-                                    ,total_inf_weak
-                                    ,total_inf_weak
-                                    ,total_inf_weak);
+                // total_inf_strong = strong_inf * inf;
+                // total_inf_weak = weak_inf * inf;
+                // /* 512 vector */
+                // scalar = _mm512_set_pd(total_inf_strong 
+                //                     ,total_inf_strong
+                //                     ,total_inf_strong
+                //                     ,total_inf_strong
+                //                     ,total_inf_weak
+                //                     ,total_inf_weak
+                //                     ,total_inf_weak
+                //                     ,total_inf_weak);
                                                          
-                __m512d neigh_vec = _mm512_set_pd(current[(i + 1)][j]
-                                            , current[(i - 1)][j]
-                                            , current[i][(j + 1) % M]
-                                            , current[i][(j - 1 + M) % M]
-                                            , current[(i - 1)][(j - 1 + M) % M]
-                                            , current[(i + 1)][(j - 1 + M) % M]
-                                            , current[(i - 1)][(j + 1) % M]
-                                            , current[(i + 1)][(j + 1) % M]);
+                // __m512d neigh_vec = _mm512_set_pd(current[(i + 1)][j]
+                //                             , current[(i - 1)][j]
+                //                             , current[i][(j + 1) % M]
+                //                             , current[i][(j - 1 + M) % M]
+                //                             , current[(i - 1)][(j - 1 + M) % M]
+                //                             , current[(i + 1)][(j - 1 + M) % M]
+                //                             , current[(i - 1)][(j + 1) % M]
+                //                             , current[(i + 1)][(j + 1) % M]);
 
-                __m512d outcome = _mm512_mul_pd(neigh_vec, scalar);
+                // __m512d outcome = _mm512_mul_pd(neigh_vec, scalar);
 
-                for (int k = 0; k < 8; k++)
-                {
-                    next[i][j] += outcome[k];
-                }
+                // for (int k = 0; k < 8; k++)
+                // {
+                //     next[i][j] += outcome[k];
+                // }
                 /*
                 const __m128 strong_scalar = _mm_set1_ps(total_inf_strong);
                 const __m128 weak_scalar = _mm_set1_ps(total_inf_weak);
