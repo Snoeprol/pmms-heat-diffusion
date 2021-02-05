@@ -35,7 +35,7 @@ void do_compute(const struct parameters *p, struct results *r)
     for (size_t i = 1; i < N + 1; i++)
     {
         for (size_t j = 0; j < M; j++)
-        {
+        {        
             if (i == 1)
             {
                 next[0][j] = p->tinit[(i - 1) * M + j];
@@ -51,16 +51,29 @@ void do_compute(const struct parameters *p, struct results *r)
 
     /* Get start time */
     gettimeofday(&start, 0);
+<<<<<<< Updated upstream
     
+=======
+>>>>>>> Stashed changes
     /* Init vars */
     double total_inf_strong;
     double total_inf_weak ;
     double inf;
+<<<<<<< Updated upstream
 
     /* Init vectors */
     // __m512d neigh_vec;
     // __m512d scalar;
     
+=======
+    /* Init vectors */
+    __m256d neigh_vec_s;
+    __m256d neigh_vec_w;
+    __m256d weak_scalar;
+    __m256d strong_scalar;
+    __m256d outcome_s;
+    __m256d outcome_w;
+>>>>>>> Stashed changes
     /* Start timesteps */
     for (int step = 0; step < p->maxiter; ++step)
     {
@@ -72,6 +85,7 @@ void do_compute(const struct parameters *p, struct results *r)
             // #pragma GCC ivdep
             for (int j = 0; j < M; j++)
             {
+<<<<<<< Updated upstream
                 // next[i][j] = cond[i][j] * current[i][j];
                 // inf = (1 - cond[i][j]);
 
@@ -132,6 +146,32 @@ void do_compute(const struct parameters *p, struct results *r)
                 // next[i][j] += weak_inf * inf * current[(i + 1)][(j - 1 + M) % M];
                 // next[i][j] += weak_inf * inf * current[(i - 1)][(j + 1) % M];
                 // next[i][j] += weak_inf * inf * current[(i + 1)][(j + 1) % M];
+=======
+                next[i][j] = cond[i][j] * current[i][j];
+                inf = (1 - cond[i][j]);
+
+                total_inf_strong = strong_inf * inf;
+                total_inf_weak = weak_inf * inf; 
+                strong_scalar = _mm256_set_pd(total_inf_strong, total_inf_strong, total_inf_strong, total_inf_strong);
+                weak_scalar = _mm256_set_pd(total_inf_weak, total_inf_weak, total_inf_weak, total_inf_weak);
+                neigh_vec_s = _mm256_set_pd(current[(i + 1)][j], current[(i - 1)][j], current[i][(j + 1) % M], current[i][(j - 1 + M) % M]);
+                neigh_vec_w = _mm256_set_pd(current[(i - 1)][(j - 1 + M) % M], current[(i + 1)][(j - 1 + M) % M], current[(i - 1)][(j + 1) % M], current[(i + 1)][(j + 1) % M]);
+                outcome_s = _mm256_mul_pd(neigh_vec_s, strong_scalar);
+                outcome_w = _mm256_mul_pd(neigh_vec_w, weak_scalar);
+                //float result_strong[4];
+                //_mm_store_ps(result_strong, outcome);
+
+                /*
+                outcome = _mm_mul_ps(myVector1, weak_scalar);
+                float result_weak[4];
+                _mm_store_ps(result_weak, outcome);
+                */
+                for (int k = 0; k < 4; k++)
+                {
+                    next[i][j] += outcome_s[k];
+                    next[i][j] += outcome_w[k];
+                }                
+>>>>>>> Stashed changes
             }
         }
         if ((step + 1) % p->printreports == 0 || p->maxiter - 1 == step)
@@ -148,7 +188,6 @@ void do_compute(const struct parameters *p, struct results *r)
 
 void compute_results(const struct parameters *p, struct results *r, int k, int M, int N, double t_array[N][M], double t_array_new[N][M], double rtime)
 {
-    r->niter = k;
     double tmin = LONG_MAX;
     double tmax = LONG_MIN;
     double t_tot = 0;
