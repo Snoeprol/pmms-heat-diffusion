@@ -6,7 +6,7 @@ OBJ=$(patsubst %.c,%.o,$(SRC))
 CC=gcc
 INCLUDES=-I../../include
 ifndef DEBUG
-CFLAGS=-O2 -std=gnu99 -march=skylake
+CFLAGS=-O2 -std=gnu99 -march=skylake -fno-tree-vectorize
 LIB=
 else
 CFLAGS=-O0 -g3 -std=gnu99
