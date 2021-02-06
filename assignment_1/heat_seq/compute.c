@@ -10,12 +10,11 @@
 #include "nmmintrin.h" // for SSE4.2
 #include "immintrin.h" // for AVX  //TODO figure out which one
 
-/* Define weak strong influences */
-double weak_inf = 1 / (4 * (sqrt(2) + 1));
-double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
-
 void do_compute(const struct parameters *p, struct results *r)
 {
+    /* Define weak strong influences */
+    double weak_inf = 1 / (4 * (sqrt(2) + 1));
+    double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
     double rtime;
     struct timeval start;
     struct timeval end;
@@ -35,7 +34,7 @@ void do_compute(const struct parameters *p, struct results *r)
     for (size_t i = 1; i < N + 1; i++)
     {
         for (size_t j = 0; j < M; j++)
-        {        
+        {
             if (i == 1)
             {
                 next[0][j] = p->tinit[(i - 1) * M + j];
@@ -56,7 +55,7 @@ void do_compute(const struct parameters *p, struct results *r)
     double total_inf_weak ;
     double inf;
 
-    
+
     /* Init vectors */
     __m256d neigh_vec_s;
     __m256d neigh_vec_w;
@@ -80,20 +79,25 @@ void do_compute(const struct parameters *p, struct results *r)
                 inf = (1 - cond[i][j]);
 
                 total_inf_strong = strong_inf * inf;
-                total_inf_weak = weak_inf * inf; 
+                total_inf_weak = weak_inf * inf;
                 strong_scalar = _mm256_set_pd(total_inf_strong, total_inf_strong, total_inf_strong, total_inf_strong);
                 weak_scalar = _mm256_set_pd(total_inf_weak, total_inf_weak, total_inf_weak, total_inf_weak);
                 neigh_vec_s = _mm256_set_pd(current[(i + 1)][j], current[(i - 1)][j], current[i][(j + 1) % M], current[i][(j - 1 + M) % M]);
                 neigh_vec_w = _mm256_set_pd(current[(i - 1)][(j - 1 + M) % M], current[(i + 1)][(j - 1 + M) % M], current[(i - 1)][(j + 1) % M], current[(i + 1)][(j + 1) % M]);
                 outcome_s = _mm256_mul_pd(neigh_vec_s, strong_scalar);
                 outcome_w = _mm256_mul_pd(neigh_vec_w, weak_scalar);
-                
+
+                double result_strong[4];
+                _mm256_store_pd(result_strong, outcome_s);
+                double result_weak[4];
+                _mm256_store_pd(result_weak, outcome_w);
+
 
                 for (int k = 0; k < 4; k++)
                 {
-                    next[i][j] += outcome_s[k];
-                    next[i][j] += outcome_w[k];
-                }                
+                    next[i][j] += result_strong[k];
+                    next[i][j] += result_weak[k];
+                }
             }
         }
         if ((step + 1) % p->printreports == 0 || p->maxiter - 1 == step)
@@ -103,7 +107,7 @@ void do_compute(const struct parameters *p, struct results *r)
             rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
                     (start.tv_sec + (start.tv_usec / 1000000.0));
             compute_results(&p, r, step + 1, M, N, &current, &next, rtime);
-            report_results(&p, r);
+            report_results(p, r);
         }
     }
 }

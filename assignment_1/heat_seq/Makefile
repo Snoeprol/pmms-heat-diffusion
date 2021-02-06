@@ -3,10 +3,10 @@ PRJ=$(CURR_DIR)
 SRC=$(filter-out $(wildcard ref*.c), $(wildcard *.c))
 OBJ=$(patsubst %.c,%.o,$(SRC))
 
-CC=gcc
+CC=icc
 INCLUDES=-I../../include
 ifndef DEBUG
-CFLAGS=-O2 -std=gnu99 -march=skylake -fno-tree-vectorize
+CFLAGS=-O2 -std=gnu99 -march=native
 LIB=
 else
 CFLAGS=-O0 -g3 -std=gnu99
@@ -19,7 +19,7 @@ $(PRJ): $(OBJ)
 	$(CC) $(CFLAGS) $(INCLUDES) $(OBJ) -o $@
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@ $(LIB)	
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@ $(LIB)
 
 clean:
 	-rm -f $(OBJ) $(PRJ)
