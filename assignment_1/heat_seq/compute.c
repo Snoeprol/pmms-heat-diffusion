@@ -47,22 +47,23 @@ void do_compute(const struct parameters *p, struct results *r)
             cond[i][j] = p->conductivity[(i - 1) * M + j];
         }
     }
-
-    /* Get start time */
-    gettimeofday(&start, 0);
     double inf;
     double curr_cond;
     double new_val;
     int step;
+    double **nextx[N + 2][M] = malloc(sizeof(double) * num_bodies);
+    double **currentx[N + 2][M] = malloc(sizeof(current) * num_bodies);
+    *nextx = next;
+    currentx = current;
+    /* Get start time */
+    gettimeofday(&start, 0);
     /* Start timesteps */
     for (step = 0; step < p->maxiter; ++step)
     {
         /* Copy next into current */
         memcpy(current, next, sizeof(double) * num_bodies);
-        #pragma GCC ivdep
         for (int i = 1; i < N + 1; i++)
         {
-            #pragma GCC ivdep
             for (int j = 0; j < M; j++)
             {
                 curr_cond = cond[i][j];
@@ -81,11 +82,13 @@ void do_compute(const struct parameters *p, struct results *r)
                 new_val += weak_inf * inf * current[(i - 1)][(j + 1) % M];
                 new_val += weak_inf * inf * current[(i + 1)][(j + 1) % M];
 
-                next[i][j] = new_val;
+                nextx[i][j] = new_val;
             }
 
         }
-        // if ((step + 1) % p->printreports == 0|| p->maxiter - 1 == step)
+    }
+    gettimeofday(&end, 0);
+            // if ((step + 1) % p->printreports == 0|| p->maxiter - 1 == step)
         // {
         //     /* Get end time and print intermediate step */
         //     gettimeofday(&end, 0);
@@ -94,8 +97,6 @@ void do_compute(const struct parameters *p, struct results *r)
         //     compute_results(&p, r, step + 1, M, N, &current, &next, rtime);
         //     report_results(&p, r);
         // }
-    }
-    gettimeofday(&end, 0);
     rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
             (start.tv_sec + (start.tv_usec / 1000000.0));
     compute_results(&p, r, step, M, N, &current, &next, rtime);

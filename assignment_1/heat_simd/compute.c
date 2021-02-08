@@ -58,13 +58,14 @@ void do_compute(const struct parameters *p, struct results *r)
     __m256d strong_scalar;
     __m256d outcome_s;
     __m256d outcome_w;
+    __m256d x;
 
     int step;
-    /* Get start time */
-    gettimeofday(&start, 0);
     double inf;
     double curr_cond;
     double new_val;
+    /* Get start time */
+    gettimeofday(&start, 0);
     /* Iterate timesteps */
     for (step = 0; step < p->maxiter; ++step)
     {
@@ -86,11 +87,8 @@ void do_compute(const struct parameters *p, struct results *r)
                 neigh_vec_w = _mm256_set_pd(current[(i - 1)][(j - 1 + M) % M], current[(i + 1)][(j - 1 + M) % M], current[(i - 1)][(j + 1) % M], current[(i + 1)][(j + 1) % M]);
                 outcome_s = _mm256_mul_pd(neigh_vec_s, strong_scalar);
                 outcome_w = _mm256_mul_pd(neigh_vec_w, weak_scalar);
-
-                for (int k = 0; k < 4; k++)
-                {
-                    new_val += outcome_s[k] + outcome_w[k];
-                }
+                x = _mm256_hadd_pd(outcome_s, outcome_w);
+                new_val += x[0] + x[1] + x[2] + x[3];
                 next[i][j] = new_val;
             }
         }
