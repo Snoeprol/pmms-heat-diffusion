@@ -8,6 +8,7 @@
 #include <string.h>
 #include <limits.h>
 
+
 /* Define weak strong influences */
 const double weak_inf = 1 / (4 * (sqrt(2) + 1));
 const double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
@@ -58,14 +59,13 @@ void do_compute(const struct parameters *p, struct results *r)
     {
         /* Copy next into current */
         memcpy(current, next, sizeof(double) * num_bodies);
-        // #pragma GCC ivdep
+        #pragma GCC ivdep
         for (int i = 1; i < N + 1; i++)
         {
-            // #pragma GCC ivdep
+            #pragma GCC ivdep
             for (int j = 0; j < M; j++)
             {
                 curr_cond = cond[i][j];
-
                 new_val = curr_cond * current[i][j];
                 inf = (1 - curr_cond);
 
@@ -83,7 +83,7 @@ void do_compute(const struct parameters *p, struct results *r)
 
                 next[i][j] = new_val;
             }
-            
+
         }
         // if ((step + 1) % p->printreports == 0|| p->maxiter - 1 == step)
         // {
