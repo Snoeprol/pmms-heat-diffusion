@@ -9,12 +9,12 @@
 #include <limits.h>
 
 
-/* Define weak strong influences */
-const double weak_inf = 1 / (4 * (sqrt(2) + 1));
-const double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
 
 void do_compute(const struct parameters *p, struct results *r)
 {
+    /* Define weak strong influences */
+    double weak_inf = 1 / (4 * (sqrt(2) + 1));
+    double strong_inf = sqrt(2) / (4 * (sqrt(2) + 1));
     double rtime;
     struct timeval start;
     struct timeval end;
@@ -51,10 +51,7 @@ void do_compute(const struct parameters *p, struct results *r)
     double curr_cond;
     double new_val;
     int step;
-    double **nextx[N + 2][M] = malloc(sizeof(double) * num_bodies);
-    double **currentx[N + 2][M] = malloc(sizeof(current) * num_bodies);
-    *nextx = next;
-    currentx = current;
+
     /* Get start time */
     gettimeofday(&start, 0);
     /* Start timesteps */
@@ -82,21 +79,21 @@ void do_compute(const struct parameters *p, struct results *r)
                 new_val += weak_inf * inf * current[(i - 1)][(j + 1) % M];
                 new_val += weak_inf * inf * current[(i + 1)][(j + 1) % M];
 
-                nextx[i][j] = new_val;
+                next[i][j] = new_val;
             }
-
+        }
+        if ((step + 1) % p->printreports == 0)
+        {
+            /* Get end time and print intermediate step */
+            gettimeofday(&end, 0);
+            rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
+                    (start.tv_sec + (start.tv_usec / 1000000.0));
+            compute_results(&p, r, step + 1, M, N, &current, &next, rtime);
+            report_results(&p, r);
         }
     }
+    /* Get end time and print intermediate step */
     gettimeofday(&end, 0);
-            // if ((step + 1) % p->printreports == 0|| p->maxiter - 1 == step)
-        // {
-        //     /* Get end time and print intermediate step */
-        //     gettimeofday(&end, 0);
-        //     rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
-        //             (start.tv_sec + (start.tv_usec / 1000000.0));
-        //     compute_results(&p, r, step + 1, M, N, &current, &next, rtime);
-        //     report_results(&p, r);
-        // }
     rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
             (start.tv_sec + (start.tv_usec / 1000000.0));
     compute_results(&p, r, step, M, N, &current, &next, rtime);

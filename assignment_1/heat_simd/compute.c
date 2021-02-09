@@ -92,16 +92,17 @@ void do_compute(const struct parameters *p, struct results *r)
                 next[i][j] = new_val;
             }
         }
-        // if ((step + 1) % p->printreports == 0|| p->maxiter - 1 == step)
-        // {
-        //     /* Get end time and print intermediate step */
-        //     gettimeofday(&end, 0);
-        //     rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
-        //             (start.tv_sec + (start.tv_usec / 1000000.0));
-        //     compute_results(&p, r, step + 1, M, N, &current, &next, rtime);
-        //     report_results(&p, r);
-        // }
+        if ((step + 1) % p->printreports == 0)
+        {
+            /* Get end time and print intermediate step */
+            gettimeofday(&end, 0);
+            rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
+                    (start.tv_sec + (start.tv_usec / 1000000.0));
+            compute_results(&p, r, step + 1, M, N, &current, &next, rtime);
+            report_results(&p, r);
+        }
     }
+    /* Get end time and print intermediate step */
     gettimeofday(&end, 0);
     rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
             (start.tv_sec + (start.tv_usec / 1000000.0));
