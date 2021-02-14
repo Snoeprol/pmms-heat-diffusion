@@ -7,7 +7,12 @@
 #include "omp.h"
 #include "ref1.c"
 
-/* ... */
+/* TODO:
+- Please note that you need to set t he number of threads on CLI or in input.c
+- Add check for num threads (and warning)
+-
+-
+*/
 
 void do_compute(const struct parameters* p, struct results *r)
 {
@@ -67,6 +72,11 @@ void do_compute(const struct parameters* p, struct results *r)
         do_copy(h, w, src);
 
         double maxdiff = 0.0;
+        // #pragma omp parallel for \
+        // num_threads(p->nthreads)\
+        // schedule(static)\
+        // private(i, j)\ // Double check, this is probably the case by default bcs it's a loop variable
+        // reduction(max: maxdiff)\
         /* compute */
         for (i = 1; i < h - 1; ++i)
             for (j = 1; j < w - 1; ++j)
