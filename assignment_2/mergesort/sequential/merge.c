@@ -10,7 +10,7 @@
 /* Ordering of the vector */
 typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
-int debug = 1;
+int debug = 0;
 
 void topDownMerge(int *v, long low, long mid, long high, int *v_temp) {
     long i = low;
@@ -148,7 +148,6 @@ int main(int argc, char **argv) {
 
     /* Sort */
     msort(vector, length);
-    printf("after calling msort in main\n");
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
