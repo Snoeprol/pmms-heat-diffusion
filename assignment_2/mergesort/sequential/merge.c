@@ -12,40 +12,45 @@ typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
 int debug = 0;
 
-void topDownMerge(int *v, long low, long mid, long high, int *v_temp) {
+void topDownMerge(int *vector, long low, long mid, long high, int *vector_work) {
     long i = low;
     long j = mid;
 
     for (long k = low; k < high; k++) {
-        if (i < mid && (j >= high || v[i] <= v[j])) {
-            v_temp[k] = v[i];
+        if (i < mid && (j >= high || vector[i] <= vector[j])) {
+            vector_work[k] = vector[i];
             i++;
         }
         else {
-            v_temp[k] = v[j];
+            vector_work[k] = vector[j];
             j++;
         }
     }
 
 }
 
-void topDownSplitMerge(int *v_temp, long low, long high, int *v) {
+void topDownSplitMerge(int *vector_work, long low, long high, int *vector) {
     if (high - low <= 1) return;
 
     long mid = (high + low) / 2;
-    topDownSplitMerge(v, low, mid, v_temp); // Sort left part (recursively)
-    topDownSplitMerge(v, mid, high, v_temp); // And right part
+    topDownSplitMerge(vector, low, mid, vector_work); // Sort left part (recursively)
+    topDownSplitMerge(vector, mid, high, vector_work); // And right part
 
     /* Merge after recursive calls for left and right part */
-    topDownMerge(v, low, mid, high, v_temp);
+    topDownMerge(vector_work, low, mid, high, vector);
 }
 
 /* Sort vector v of l elements using mergesort */
-void msort(int *v, long l){
-    /* Create a work array v_temp and copy v into it*/
-    int *v_temp = (int*) malloc(l * sizeof(int));
-    memcpy(v_temp ,v, l * sizeof(int));
-    topDownSplitMerge(v_temp, 0, l, v);
+void msort(int *vector, long length){
+    /* Create a work array vector_work and copy v into it*/
+    int *vector_work = (int*) malloc(length * sizeof(int));
+    if(vector_work == NULL) {
+        fprintf(stderr, "Malloc failed...\n");
+        return;
+    }
+    memcpy(vector_work ,vector, length * sizeof(int));
+
+    topDownSplitMerge(vector_work, 0, length, vector);
 }
 
 
