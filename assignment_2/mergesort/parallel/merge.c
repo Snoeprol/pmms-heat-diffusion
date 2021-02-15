@@ -5,16 +5,59 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <omp.h>
+#include <string.h>
 
 /* Ordering of the vector */
 typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
 int debug = 0;
 
-/* Sort vector v of l elements using mergesort */
-void msort(int *v, long l){
+void topDownMerge(int *v, long low, long mid, long high, int *v_temp) {
+    long i = low;
+    long j = mid;
+
+    for (long k = low; k < high; k++) {
+        if (i < mid && (j >= high || v[i] <= v[j])) {
+            v_temp[k] = v[i];
+            i++;
+        }
+        else {
+            v_temp[k] = v[j];
+            j++;
+        }
+    }
 
 }
+
+void topDownSplitMerge(int *v_temp, long low, long high, int *v) {
+    if (high - low <= 1) return;
+
+    long mid = (high + low) / 2;
+    #pragma omp task shared(v_temp, v) firstprivate(low, mid)
+    topDownSplitMerge(v, low, mid, v_temp); // Sort left part (recursively)
+
+    #pragma omp task shared(v_temp, v) firstprivate(mid, high)
+    topDownSplitMerge(v, mid, high, v_temp); // And right part
+
+    #pragma omp taskwait
+    /* Merge after recursive calls for left and right part */
+    topDownMerge(v, low, mid, high, v_temp);
+}
+
+/* Sort vector v of l elements using mergesort */
+void msort(int *v, long l, int num_threads){
+    /* Create a work array v_temp and copy v into it*/
+    int *v_temp = (int*) malloc(l * sizeof(int));
+    memcpy(v_temp ,v, l * sizeof(int));
+    // I'm not sure if we need to specify the number of threads in the pragma below
+    // As we already do this in main "towards openmp"
+    #pragma omp parallel shared(v, v_temp, l) num_threads(num_threads)
+    {
+        topDownSplitMerge(v_temp, 0, l, v);
+    }
+
+}
+
 
 void print_v(int *v, long l) {
     printf("\n");
@@ -111,10 +154,12 @@ int main(int argc, char **argv) {
         print_v(vector, length);
     }
 
+    omp_set_num_threads(num_threads);
+
     clock_gettime(CLOCK_MONOTONIC, &before);
 
     /* Sort */
-    msort(vector, length);
+    msort(vector, length, num_threads);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
