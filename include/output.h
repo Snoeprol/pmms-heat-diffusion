@@ -18,7 +18,7 @@ void report_results(const struct parameters *p, const struct results *r);
 
 /* helper API to output the cylinder as a picture */
 
-void begin_picture(size_t key, 
+void begin_picture(size_t key,
                    size_t width, size_t height,
                    double vmin, double vmax);
 

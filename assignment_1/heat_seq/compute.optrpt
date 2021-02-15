@@ -1,0 +1,121 @@
+
+Begin optimization report for: do_compute(const struct parameters *, struct results *)
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at compute.c(34,5)
+   remark #25460: No loop optimizations reported
+
+   LOOP BEGIN at compute.c(36,9)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+   <Remainder>
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+   <Remainder>
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+   <Peeled>
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+   <Remainder>
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+   <Peeled>
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+
+   LOOP BEGIN at compute.c(36,9)
+   <Remainder>
+   LOOP END
+LOOP END
+
+LOOP BEGIN at compute.c(73,9)
+<Distributed chunk1>
+
+   LOOP BEGIN at compute.c(76,13)
+   <Peeled, Distributed chunk1>
+   LOOP END
+
+   LOOP BEGIN at compute.c(76,13)
+   <Distributed chunk1>
+      remark #15301: PARTIAL LOOP WAS VECTORIZED
+   LOOP END
+
+   LOOP BEGIN at compute.c(76,13)
+   <Remainder, Distributed chunk1>
+      remark #15301: REMAINDER LOOP WAS VECTORIZED
+   LOOP END
+
+   LOOP BEGIN at compute.c(76,13)
+   <Remainder, Distributed chunk1>
+   LOOP END
+LOOP END
+
+LOOP BEGIN at compute.c(73,9)
+<Distributed chunk2>
+
+   LOOP BEGIN at compute.c(76,13)
+   <Distributed chunk2>
+
+      LOOP BEGIN at compute.c(96,17)
+      LOOP END
+   LOOP END
+LOOP END
+
+LOOP BEGIN at compute.c(124,5) inlined into compute.c(109,13)
+   remark #25460: No loop optimizations reported
+
+   LOOP BEGIN at compute.c(127,9) inlined into compute.c(109,13)
+   <Peeled>
+   LOOP END
+
+   LOOP BEGIN at compute.c(127,9) inlined into compute.c(109,13)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+
+   LOOP BEGIN at compute.c(127,9) inlined into compute.c(109,13)
+   <Remainder>
+   LOOP END
+LOOP END
+===========================================================================
+
+Begin optimization report for: compute_results()
+
+    Report from: Vector optimizations [vec]
+
+
+LOOP BEGIN at compute.c(124,5)
+   remark #25460: No loop optimizations reported
+
+   LOOP BEGIN at compute.c(127,9)
+   <Peeled>
+   LOOP END
+
+   LOOP BEGIN at compute.c(127,9)
+      remark #15300: LOOP WAS VECTORIZED
+   LOOP END
+
+   LOOP BEGIN at compute.c(127,9)
+   <Remainder>
+   LOOP END
+LOOP END
+===========================================================================

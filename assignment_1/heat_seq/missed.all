@@ -1,0 +1,78 @@
+compute.c:109:13: missed:   will not early inline: do_compute/5387->compute_results/5388, call is cold and code would grow at least by 18
+missed:   not inlinable: do_compute/5387 -> __builtin_stack_restore/5393, function body not available
+compute.c:110:13: missed:   not inlinable: do_compute/5387 -> report_results/5392, function body not available
+compute.c:109:13: missed:   not inlinable: do_compute/5387 -> compute_results/5388, --param max-inline-insns-auto limit reached
+compute.c:106:13: missed:   not inlinable: do_compute/5387 -> gettimeofday/5391, function body not available
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:34:10: missed:   not inlinable: do_compute/5387 -> __builtin___memcpy_chk/5395, function body not available
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:34:10: missed:   not inlinable: do_compute/5387 -> __builtin_object_size/5394, function body not available
+compute.c:52:5: missed:   not inlinable: do_compute/5387 -> gettimeofday/5391, function body not available
+compute.c:31:12: missed:   not inlinable: do_compute/5387 -> __builtin_alloca_with_align/5390, function body not available
+compute.c:30:12: missed:   not inlinable: do_compute/5387 -> __builtin_alloca_with_align/5390, function body not available
+compute.c:29:12: missed:   not inlinable: do_compute/5387 -> __builtin_alloca_with_align/5390, function body not available
+compute.c:14:1: missed:   not inlinable: do_compute/5387 -> __builtin_stack_save/5389, function body not available
+compute.c:85:31: missed: failed: evolution of offset is not affine.
+compute.c:85:31: missed: failed: evolution of offset is not affine.
+compute.c:86:31: missed: failed: evolution of offset is not affine.
+compute.c:86:31: missed: failed: evolution of offset is not affine.
+compute.c:86:31: missed: failed: evolution of offset is not affine.
+compute.c:86:31: missed: failed: evolution of offset is not affine.
+fail.c:12:5: missed:   not inlinable: die/40 -> exit/44, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:103:10: missed:   not inlinable: die/40 -> __fprintf_chk/45, function body not available
+fail.c:9:9: missed:   not inlinable: die/40 -> perror/42, function body not available
+fail.c:8:9: missed:   not inlinable: die/40 -> __errno_location/41, function body not available
+img.c:59:5: missed:   not inlinable: end_picture/48 -> free/54, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:110:10: missed:   not inlinable: end_picture/48 -> __printf_chk/58, function body not available
+img.c:57:5: missed:   not inlinable: end_picture/48 -> fclose/53, function body not available
+img.c:53:9: missed:   not inlinable: end_picture/48 -> fputc/52, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:103:10: missed:   not inlinable: end_picture/48 -> __fprintf_chk/57, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:103:10: missed:   not inlinable: end_picture/48 -> __fprintf_chk/57, function body not available
+img.c:39:35: missed:   not inlinable: end_picture/48 -> die/50, function body not available
+img.c:39:15: missed:   not inlinable: end_picture/48 -> fopen/51, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:110:10: missed:   not inlinable: end_picture/48 -> __printf_chk/58, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:70:10: missed:   not inlinable: end_picture/48 -> __builtin___snprintf_chk/56, function body not available
+img.c:15:60: missed:   not inlinable: begin_picture/46 -> die/50, function body not available
+img.c:15:19: missed:   not inlinable: begin_picture/46 -> calloc/49, function body not available
+input.c:138:9: missed:   will not early inline: read_parameters/45->readpgm_float/44, call is cold and code would grow at least by 82
+input.c:133:9: missed:   will not early inline: read_parameters/45->readpgm_float/44, call is cold and code would grow at least by 82
+input.c:105:28: missed:   will not early inline: read_parameters/45->usage/43, call is cold and code would grow by 4
+input.c:138:9: missed:   not inlinable: read_parameters/45 -> readpgm_float/44, --param max-inline-insns-auto limit reached
+input.c:136:64: missed:   not inlinable: read_parameters/45 -> die/50, function body not available
+input.c:136:26: missed:   not inlinable: read_parameters/45 -> calloc/52, function body not available
+input.c:133:9: missed:   not inlinable: read_parameters/45 -> readpgm_float/44, --param max-inline-insns-auto limit reached
+input.c:131:57: missed:   not inlinable: read_parameters/45 -> die/50, function body not available
+input.c:131:19: missed:   not inlinable: read_parameters/45 -> calloc/52, function body not available
+input.c:129:5: missed:   not inlinable: read_parameters/45 -> atexit/51, function body not available
+input.c:127:25: missed:   not inlinable: read_parameters/45 -> die/50, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:110:10: missed:   not inlinable: read_parameters/45 -> __printf_chk/55, function body not available
+input.c:91:18: missed:   not inlinable: read_parameters/45 -> getopt/49, function body not available
+input.c:103:33: missed:   not inlinable: read_parameters/45 -> strtol/47, function body not available
+input.c:102:32: missed:   not inlinable: read_parameters/45 -> strtod/48, function body not available
+input.c:101:32: missed:   not inlinable: read_parameters/45 -> strtod/48, function body not available
+input.c:100:34: missed:   not inlinable: read_parameters/45 -> strtod/48, function body not available
+input.c:99:36: missed:   not inlinable: read_parameters/45 -> strtol/47, function body not available
+input.c:98:36: missed:   not inlinable: read_parameters/45 -> strtol/47, function body not available
+input.c:97:31: missed:   not inlinable: read_parameters/45 -> strtol/47, function body not available
+input.c:96:32: missed:   not inlinable: read_parameters/45 -> strtol/47, function body not available
+input.c:69:5: missed:   not inlinable: readpgm_float/44 -> fclose/59, function body not available
+input.c:65:39: missed:   not inlinable: readpgm_float/44 -> die/50, function body not available
+input.c:65:13: missed:   not inlinable: readpgm_float/44 -> fscanf/57, function body not available
+input.c:60:9: missed:   not inlinable: readpgm_float/44 -> die/50, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:103:10: missed:   not inlinable: readpgm_float/44 -> __fprintf_chk/60, function body not available
+input.c:55:38: missed:   not inlinable: readpgm_float/44 -> die/50, function body not available
+input.c:55:9: missed:   not inlinable: readpgm_float/44 -> fscanf/57, function body not available
+input.c:54:9: missed:   not inlinable: readpgm_float/44 -> fscanf/57, function body not available
+input.c:53:9: missed:   not inlinable: readpgm_float/44 -> fscanf/57, function body not available
+input.c:51:47: missed:   not inlinable: readpgm_float/44 -> die/50, function body not available
+input.c:50:5: missed:   not inlinable: readpgm_float/44 -> fscanf/57, function body not available
+input.c:48:35: missed:   not inlinable: readpgm_float/44 -> die/50, function body not available
+input.c:48:15: missed:   not inlinable: readpgm_float/44 -> fopen/56, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:110:10: missed:   not inlinable: readpgm_float/44 -> __printf_chk/55, function body not available
+input.c:34:5: missed:   not inlinable: usage/43 -> exit/54, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:110:10: missed:   not inlinable: usage/43 -> __printf_chk/55, function body not available
+input.c:14:5: missed:   not inlinable: cleanup/42 -> free/53, function body not available
+input.c:13:5: missed:   not inlinable: cleanup/42 -> free/53, function body not available
+main.c:12:5: missed:   not inlinable: main/0 -> report_results/3, function body not available
+main.c:10:5: missed:   not inlinable: main/0 -> do_compute/2, function body not available
+main.c:8:5: missed:   not inlinable: main/0 -> read_parameters/1, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:110:10: missed:   not inlinable: report_results/24 -> __printf_chk/26, function body not available
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:110:10: missed:   not inlinable: report_results/24 -> __printf_chk/26, function body not available

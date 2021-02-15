@@ -1,0 +1,13 @@
+#!/bin/bash
+module load prun/default
+../../images/gen_im.o 1000 1000
+
+# Square grids
+for (( c=1; c<=5; c++ ))
+do(
+        B=$( printf '%ix%i.pgm' 1000 1000 )
+        sleep 5s
+	prun -v -1 -np 1 -1 heat_seq -n 1000 -m 1000 -c $B -t $B -i 50
+) 
+done
+wait
