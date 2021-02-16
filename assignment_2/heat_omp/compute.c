@@ -73,10 +73,10 @@ void do_compute(const struct parameters* p, struct results *r)
 
         double maxdiff = 0.0;
         // Note that i and j are private by default, i because of pragma and j because it's declared inside the parallel loop
-        // #pragma omp parallel for \
-        // num_threads(p->nthreads)\
-        // schedule(static)\
-        // reduction(max: maxdiff)\
+        #pragma omp parallel for \
+        num_threads(p->nthreads)\
+        schedule(dynamic)\
+        reduction(max: maxdiff)\
         /* compute */
         for (i = 1; i < h - 1; ++i)
             for (int j = 1; j < w - 1; ++j)
