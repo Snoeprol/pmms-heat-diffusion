@@ -85,7 +85,7 @@ void msort(int *vector, long length, int num_threads)
             topDownSplitMerge(vector_work, 0, length, vector);
         };
     }
-    topDownMerge(v_work, 0, (int) l/2, l, v);
+    topDownMerge(vector_work, 0, (int) length/2, length, vector);
 }
 
 void print_v(int *v, long l)
