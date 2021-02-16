@@ -37,7 +37,7 @@ void topDownSplitMerge(int *v_temp, long low, long high, int *v) {
     topDownSplitMerge(v, mid, high, v_temp); // And right part
 
     /* Merge after recursive calls for left and right part */
-    topDownMerge(v, low, mid, high, v_temp);
+    topDownMerge(v_temp, low, mid, high, v);
 }
 
 /* Sort vector v of l elements using mergesort */
