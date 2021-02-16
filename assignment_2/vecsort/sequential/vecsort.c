@@ -12,8 +12,45 @@ typedef enum Ordering {ASCENDING, DESCENDING, RANDOM} Order;
 
 int debug = 0;
 
-void vecsort(/* ...  */){
-    //TODO: Just Do It. Don't let your dreams be dreams.
+void topDownMerge(int *v, long low, long mid, long high, int *v_temp) {
+    long i = low;
+    long j = mid;
+
+    for (long k = low; k < high; k++) {
+        if (i < mid && (j >= high || v[i] <= v[j])) {
+            v_temp[k] = v[i];
+            i++;
+        }
+        else {
+            v_temp[k] = v[j];
+            j++;
+        }
+    }
+
+}
+
+void topDownSplitMerge(int *v_temp, long low, long high, int *v) {
+    if (high - low <= 1) return;
+
+    long mid = (high + low) / 2;
+    topDownSplitMerge(v, low, mid, v_temp); // Sort left part (recursively)
+    topDownSplitMerge(v, mid, high, v_temp); // And right part
+
+    /* Merge after recursive calls for left and right part */
+    topDownMerge(v, low, mid, high, v_temp);
+}
+
+/* Sort vector v of l elements using mergesort */
+void msort(int *v, long l){
+    /* Create a work array v_temp and copy v into it*/
+    int *v_temp = (int*) malloc(l * sizeof(int));
+    memcpy(v_temp ,v, l * sizeof(int));
+    topDownSplitMerge(v_temp, 0, l, v);
+}
+
+void vecsort(int * vector_lengths, int ** vector_vectors, int length_outer){
+    for(int i = 0; i < length_outer; i++)
+	msort(vector_vectors[i], vector_lengths[i]);
 }
 
 void print_v(int **vector_vectors, int *vector_lengths, long length_outer) {
@@ -118,7 +155,7 @@ int main(int argc, char **argv) {
                 break;
             case DESCENDING:
                 for (long j = 0; j < length_inner; j++) {
-                    vector_vectors[i][j] = (int) (length_inner - i);
+                    vector_vectors[i][j] = (int) (length_inner - j);
                 }
                 break;
             case RANDOM:
@@ -136,7 +173,7 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &before);
 
     /* Sort */
-    vecsort(/* ... */);
+    vecsort(vector_lengths, vector_vectors, length_outer);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
@@ -145,7 +182,7 @@ int main(int argc, char **argv) {
     printf("Vecsort took: % .6e \n", time);
 
     if(debug) {
-        print_v(vector_vectors, vector_lengths, length_outer);
+        print_v(vector_lengths, vector_vectors, length_outer);
     }
 
     return 0;
