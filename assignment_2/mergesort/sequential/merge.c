@@ -51,7 +51,7 @@ void msort(int *vector, long length){
     memcpy(vector_work ,vector, length * sizeof(int));
 
     topDownSplitMerge(vector_work, 0, length, vector);
-    topDownMerge(v_temp, 0, (int) l/2, l, v);
+    topDownMerge(vector_work, 0, (int) l/2, l, v);
 }
 
 

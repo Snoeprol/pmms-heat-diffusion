@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
     printf("Vecsort took: % .6e \n", time);
 
     if(debug) {
-        print_v(vector_lengths, vector_vectors, length_outer);
+        print_v(vector_vectors, vector_lengths, length_outer);
     }
 
     return 0;

@@ -56,8 +56,7 @@ void msort(int *v, long l, int num_threads){
 
 }
 
-void vecsort(int * vector_lengths, int ** vector_vectors, int length_outer, int num_threads){
-    omp_set_num_threads(num_threads);
+void vecsort(int * vector_lengths, int ** vector_vectors, int length_outer){
     # pragma omp parallel for schedule(guided, 1)
     for(int i = 0; i < length_outer; i++)
 	msort(vector_vectors[i], vector_lengths[i], num_threads);
@@ -180,12 +179,12 @@ int main(int argc, char **argv) {
         print_v(vector_vectors, vector_lengths, length_outer);
     }
     // Set nr of threads
-    //omp_set_num_threads(num_threads);
+    omp_set_num_threads(num_threads);
 
     clock_gettime(CLOCK_MONOTONIC, &before);
   
     /* Sort */
-    vecsort(vector_lengths, vector_vectors, length_outer, num_threads);
+    vecsort(vector_lengths, vector_vectors, length_outer);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
