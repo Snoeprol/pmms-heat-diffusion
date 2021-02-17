@@ -1,5 +1,5 @@
 #!/bin/bash
-for i in 2500,2500
+for i in 5000,5000
 do(
 IFS=',' read item1 item2 <<< "${i}"
 B=$( printf '%ix%i.pgm' ${item2} ${item1} )

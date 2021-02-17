@@ -1,0 +1,327 @@
+        schedule(static)\
+Parameters:
+  -n 20000 # number of rows
+  -m 100 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 20000x100.pgm # input file for conductivity
+  -t 20000x100.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 20000x100.pgm...
+Reading PGM data from 20000x100.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             3.257640e+01  1.000000e+02  2.731320e+00  7.096540e+01  3.117266e-02  7.763212e+09
+20             3.199767e+01  1.000000e+02  1.153117e+00  7.432536e+01  6.022846e-02  8.036067e+09
+30             2.991538e+01  1.000000e+02  6.946665e-01  7.607035e+01  8.873683e-02  8.181496e+09
+40             2.854730e+01  1.000000e+02  4.535388e-01  7.721137e+01  1.163123e-01  8.322422e+09
+50             2.759092e+01  1.000000e+02  3.359321e-01  7.804320e+01  1.430825e-01  8.456661e+09
+60             2.689013e+01  1.000000e+02  2.685951e-01  7.868979e+01  1.691594e-01  8.583619e+09
+70             2.635598e+01  1.000000e+02  2.225980e-01  7.921416e+01  1.948211e-01  8.695158e+09
+80             2.593474e+01  1.000000e+02  1.964803e-01  7.965245e+01  2.203960e-01  8.784189e+09
+90             2.559262e+01  1.000000e+02  1.835056e-01  8.002714e+01  2.459953e-01  8.853827e+09
+100            2.530767e+01  1.000000e+02  1.714886e-01  8.035313e+01  2.715062e-01  8.913239e+09
+Parameters:
+  -n 100 # number of rows
+  -m 20000 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 100x20000.pgm # input file for conductivity
+  -t 100x20000.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 100x20000.pgm...
+Reading PGM data from 100x20000.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.282950e+01  1.000000e+02  2.801416e+00  7.066880e+01  3.190192e-02  7.585750e+09
+20             2.394783e+01  1.000000e+02  1.140812e+00  7.381217e+01  6.397516e-02  7.565437e+09
+30             2.387656e+01  1.000000e+02  6.498786e-01  7.538119e+01  9.299260e-02  7.807073e+09
+40             2.368127e+01  1.000000e+02  4.644960e-01  7.637058e+01  1.216033e-01  7.960308e+09
+50             2.310758e+01  1.000000e+02  3.782561e-01  7.706747e+01  1.487134e-01  8.136458e+09
+60             2.255226e+01  1.000000e+02  3.285784e-01  7.759142e+01  1.755347e-01  8.271870e+09
+70             2.217850e+01  1.000000e+02  2.968259e-01  7.800270e+01  2.016847e-01  8.399247e+09
+80             2.191662e+01  1.000000e+02  2.681359e-01  7.833556e+01  2.279140e-01  8.494432e+09
+90             2.172652e+01  1.000000e+02  2.422583e-01  7.861116e+01  2.538789e-01  8.578892e+09
+100            2.158421e+01  1.000000e+02  2.189569e-01  7.884342e+01  2.800626e-01  8.640925e+09
+Parameters:
+  -n 2500 # number of rows
+  -m 2500 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 2500x2500.pgm # input file for conductivity
+  -t 2500x2500.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 2500x2500.pgm...
+Reading PGM data from 2500x2500.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.771666e+01  1.000000e+02  2.779721e+00  7.102960e+01  1.159674e-01  6.521232e+09
+20             2.823612e+01  1.000000e+02  1.198767e+00  7.438375e+01  2.272150e-01  6.656692e+09
+30             2.809956e+01  1.000000e+02  6.872016e-01  7.612101e+01  3.368959e-01  6.734275e+09
+40             2.758101e+01  1.000000e+02  4.608909e-01  7.725456e+01  4.465954e-01  6.773468e+09
+50             2.709803e+01  1.000000e+02  3.417542e-01  7.807948e+01  5.562312e-01  6.797982e+09
+60             2.671122e+01  1.000000e+02  2.874887e-01  7.871970e+01  6.662339e-01  6.810671e+09
+70             2.639070e+01  1.000000e+02  2.558340e-01  7.923819e+01  7.758703e-01  6.822983e+09
+80             2.611874e+01  1.000000e+02  2.279278e-01  7.967101e+01  8.850605e-01  6.835691e+09
+90             2.588372e+01  1.000000e+02  2.033520e-01  8.004062e+01  9.947421e-01  6.842226e+09
+100            2.567759e+01  1.000000e+02  1.884232e-01  8.036184e+01  1.090962e+00  6.931958e+09
+Parameters:
+  -n 5000 # number of rows
+  -m 5000 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 5000x5000.pgm # input file for conductivity
+  -t 5000x5000.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 5000x5000.pgm...
+Reading PGM data from 5000x5000.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.383696e+01  1.000000e+02  2.859428e+00  7.103572e+01  3.723810e-01  8.123400e+09
+20             2.336694e+01  1.000000e+02  1.193821e+00  7.439259e+01  7.644560e-01  7.914124e+09
+30             2.326743e+01  1.000000e+02  6.936022e-01  7.613263e+01  1.242399e+00  7.304415e+09
+40             2.322791e+01  1.000000e+02  5.026894e-01  7.726882e+01  1.613018e+00  7.501465e+09
+50             2.320027e+01  1.000000e+02  3.786560e-01  7.809616e+01  1.983771e+00  7.624370e+09
+60             2.317170e+01  1.000000e+02  3.058377e-01  7.873859e+01  2.230884e+00  8.135787e+09
+70             2.313799e+01  1.000000e+02  2.664719e-01  7.925909e+01  2.486637e+00  8.515516e+09
+80             2.309841e+01  1.000000e+02  2.433865e-01  7.969374e+01  2.741134e+00  8.828464e+09
+90             2.305380e+01  1.000000e+02  2.221345e-01  8.006502e+01  3.003001e+00  9.065931e+09
+100            2.291764e+01  1.000000e+02  2.026479e-01  8.038780e+01  3.263550e+00  9.269047e+09
+        schedule(dynamic)\
+Parameters:
+  -n 20000 # number of rows
+  -m 100 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 20000x100.pgm # input file for conductivity
+  -t 20000x100.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 20000x100.pgm...
+Reading PGM data from 20000x100.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             3.257640e+01  1.000000e+02  2.731320e+00  7.096540e+01  5.741733e-02  4.214755e+09
+20             3.199767e+01  1.000000e+02  1.153117e+00  7.432536e+01  1.076147e-01  4.497528e+09
+30             2.991538e+01  1.000000e+02  6.946665e-01  7.607035e+01  1.547128e-01  4.692565e+09
+40             2.854730e+01  1.000000e+02  4.535388e-01  7.721137e+01  2.005159e-01  4.827547e+09
+50             2.759092e+01  1.000000e+02  3.359321e-01  7.804320e+01  2.446639e-01  4.945561e+09
+60             2.689013e+01  1.000000e+02  2.685951e-01  7.868979e+01  2.904341e-01  4.999412e+09
+70             2.635598e+01  1.000000e+02  2.225980e-01  7.921416e+01  3.354855e-01  5.049399e+09
+80             2.593474e+01  1.000000e+02  1.964803e-01  7.965245e+01  3.801518e-01  5.092703e+09
+90             2.559262e+01  1.000000e+02  1.835056e-01  8.002714e+01  4.243604e-01  5.132430e+09
+100            2.530767e+01  1.000000e+02  1.714886e-01  8.035313e+01  4.691306e-01  5.158478e+09
+Parameters:
+  -n 100 # number of rows
+  -m 20000 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 100x20000.pgm # input file for conductivity
+  -t 100x20000.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 100x20000.pgm...
+Reading PGM data from 100x20000.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.282950e+01  1.000000e+02  2.801416e+00  7.066880e+01  3.130514e-02  7.730359e+09
+20             2.394783e+01  1.000000e+02  1.140812e+00  7.381217e+01  5.886774e-02  8.221821e+09
+30             2.387656e+01  1.000000e+02  6.498786e-01  7.538119e+01  8.487594e-02  8.553660e+09
+40             2.368127e+01  1.000000e+02  4.644960e-01  7.637058e+01  1.098894e-01  8.808858e+09
+50             2.310758e+01  1.000000e+02  3.782561e-01  7.706747e+01  1.340903e-01  9.023770e+09
+60             2.255226e+01  1.000000e+02  3.285784e-01  7.759142e+01  1.597403e-01  9.089755e+09
+70             2.217850e+01  1.000000e+02  2.968259e-01  7.800270e+01  1.848067e-01  9.166337e+09
+80             2.191662e+01  1.000000e+02  2.681359e-01  7.833556e+01  2.100581e-01  9.216500e+09
+90             2.172652e+01  1.000000e+02  2.422583e-01  7.861116e+01  2.346660e-01  9.281276e+09
+100            2.158421e+01  1.000000e+02  2.189569e-01  7.884342e+01  2.600509e-01  9.305872e+09
+Parameters:
+  -n 2500 # number of rows
+  -m 2500 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 2500x2500.pgm # input file for conductivity
+  -t 2500x2500.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 2500x2500.pgm...
+Reading PGM data from 2500x2500.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.771666e+01  1.000000e+02  2.779721e+00  7.102960e+01  8.854294e-02  8.541054e+09
+20             2.823612e+01  1.000000e+02  1.198767e+00  7.438375e+01  1.654879e-01  9.139644e+09
+30             2.809956e+01  1.000000e+02  6.872016e-01  7.612101e+01  2.430830e-01  9.333233e+09
+40             2.758101e+01  1.000000e+02  4.608909e-01  7.725456e+01  3.185749e-01  9.495412e+09
+50             2.709803e+01  1.000000e+02  3.417542e-01  7.807948e+01  3.909480e-01  9.672002e+09
+60             2.671122e+01  1.000000e+02  2.874887e-01  7.871970e+01  4.673334e-01  9.709342e+09
+70             2.639070e+01  1.000000e+02  2.558340e-01  7.923819e+01  5.448234e-01  9.716451e+09
+80             2.611874e+01  1.000000e+02  2.279278e-01  7.967101e+01  6.205582e-01  9.749287e+09
+90             2.588372e+01  1.000000e+02  2.033520e-01  8.004062e+01  6.969238e-01  9.766132e+09
+100            2.567759e+01  1.000000e+02  1.884232e-01  8.036184e+01  7.733173e-01  9.779298e+09
+Parameters:
+  -n 5000 # number of rows
+  -m 5000 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 5000x5000.pgm # input file for conductivity
+  -t 5000x5000.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 5000x5000.pgm...
+Reading PGM data from 5000x5000.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.383696e+01  1.000000e+02  2.859428e+00  7.103572e+01  3.016954e-01  1.002667e+10
+20             2.336694e+01  1.000000e+02  1.193821e+00  7.439259e+01  6.155189e-01  9.829105e+09
+30             2.326743e+01  1.000000e+02  6.936022e-01  7.613263e+01  9.252256e-01  9.808419e+09
+40             2.322791e+01  1.000000e+02  5.026894e-01  7.726882e+01  1.242362e+00  9.739509e+09
+50             2.320027e+01  1.000000e+02  3.786560e-01  7.809616e+01  1.567618e+00  9.648399e+09
+60             2.317170e+01  1.000000e+02  3.058377e-01  7.873859e+01  1.890877e+00  9.598722e+09
+70             2.313799e+01  1.000000e+02  2.664719e-01  7.925909e+01  2.211102e+00  9.576672e+09
+80             2.309841e+01  1.000000e+02  2.433865e-01  7.969374e+01  2.516044e+00  9.618273e+09
+90             2.305380e+01  1.000000e+02  2.221345e-01  8.006502e+01  2.830456e+00  9.618592e+09
+100            2.291764e+01  1.000000e+02  2.026479e-01  8.038780e+01  3.145185e+00  9.617875e+09
+        schedule(guided,1)\
+Parameters:
+  -n 20000 # number of rows
+  -m 100 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 20000x100.pgm # input file for conductivity
+  -t 20000x100.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 20000x100.pgm...
+Reading PGM data from 20000x100.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             3.257640e+01  1.000000e+02  2.731320e+00  7.096540e+01  3.012971e-02  8.031938e+09
+20             3.199767e+01  1.000000e+02  1.153117e+00  7.432536e+01  5.905208e-02  8.196155e+09
+30             2.991538e+01  1.000000e+02  6.946665e-01  7.607035e+01  8.514091e-02  8.527041e+09
+40             2.854730e+01  1.000000e+02  4.535388e-01  7.721137e+01  1.097155e-01  8.822820e+09
+50             2.759092e+01  1.000000e+02  3.359321e-01  7.804320e+01  1.352929e-01  8.943557e+09
+60             2.689013e+01  1.000000e+02  2.685951e-01  7.868979e+01  1.594898e-01  9.104033e+09
+70             2.635598e+01  1.000000e+02  2.225980e-01  7.921416e+01  1.848159e-01  9.165880e+09
+80             2.593474e+01  1.000000e+02  1.964803e-01  7.965245e+01  2.088577e-01  9.269470e+09
+90             2.559262e+01  1.000000e+02  1.835056e-01  8.002714e+01  2.327651e-01  9.357071e+09
+100            2.530767e+01  1.000000e+02  1.714886e-01  8.035313e+01  2.567595e-01  9.425164e+09
+Parameters:
+  -n 100 # number of rows
+  -m 20000 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 100x20000.pgm # input file for conductivity
+  -t 100x20000.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 100x20000.pgm...
+Reading PGM data from 100x20000.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.282950e+01  1.000000e+02  2.801416e+00  7.066880e+01  2.991476e-02  8.089652e+09
+20             2.394783e+01  1.000000e+02  1.140812e+00  7.381217e+01  5.842540e-02  8.284068e+09
+30             2.387656e+01  1.000000e+02  6.498786e-01  7.538119e+01  8.585590e-02  8.456029e+09
+40             2.368127e+01  1.000000e+02  4.644960e-01  7.637058e+01  1.125632e-01  8.599617e+09
+50             2.310758e+01  1.000000e+02  3.782561e-01  7.706747e+01  1.365630e-01  8.860382e+09
+60             2.255226e+01  1.000000e+02  3.285784e-01  7.759142e+01  1.587868e-01  9.144339e+09
+70             2.217850e+01  1.000000e+02  2.968259e-01  7.800270e+01  1.809337e-01  9.362546e+09
+80             2.191662e+01  1.000000e+02  2.681359e-01  7.833556e+01  2.043153e-01  9.475550e+09
+90             2.172652e+01  1.000000e+02  2.422583e-01  7.861116e+01  2.273943e-01  9.578077e+09
+100            2.158421e+01  1.000000e+02  2.189569e-01  7.884342e+01  2.507611e-01  9.650618e+09
+Parameters:
+  -n 2500 # number of rows
+  -m 2500 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 2500x2500.pgm # input file for conductivity
+  -t 2500x2500.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 2500x2500.pgm...
+Reading PGM data from 2500x2500.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.771666e+01  1.000000e+02  2.779721e+00  7.102960e+01  9.572169e-02  7.900508e+09
+20             2.823612e+01  1.000000e+02  1.198767e+00  7.438375e+01  1.972560e-01  7.667700e+09
+30             2.809956e+01  1.000000e+02  6.872016e-01  7.612101e+01  2.921094e-01  7.766782e+09
+40             2.758101e+01  1.000000e+02  4.608909e-01  7.725456e+01  3.806576e-01  7.946774e+09
+50             2.709803e+01  1.000000e+02  3.417542e-01  7.807948e+01  4.750693e-01  7.959365e+09
+60             2.671122e+01  1.000000e+02  2.874887e-01  7.871970e+01  5.671753e-01  8.000172e+09
+70             2.639070e+01  1.000000e+02  2.558340e-01  7.923819e+01  6.665233e-01  7.942332e+09
+80             2.611874e+01  1.000000e+02  2.279278e-01  7.967101e+01  7.526334e-01  8.038442e+09
+90             2.588372e+01  1.000000e+02  2.033520e-01  8.004062e+01  8.512065e-01  7.996003e+09
+100            2.567759e+01  1.000000e+02  1.884232e-01  8.036184e+01  9.430275e-01  8.019384e+09
+Parameters:
+  -n 5000 # number of rows
+  -m 5000 # number of columns
+  -i 100 # maximum number of iterations
+  -k 10 # reduction period
+  -e 1.000000e-01 # convergence threshold
+  -c 5000x5000.pgm # input file for conductivity
+  -t 5000x5000.pgm # input file for initial temperatures
+  -L 0.000000e+00 # coolest temperature in input/output
+  -H 1.000000e+02 # highest temperature in input/output
+  -p 8 # number of threads (if applicable)
+  -r 10 # print intermediate reports every reduction cycle
+Reading PGM data from 5000x5000.pgm...
+Reading PGM data from 5000x5000.pgm...
+Output:
+
+   Iterations        T(min)        T(max)       T(diff)        T(avg)          Time        FLOP/s
+10             2.383696e+01  1.000000e+02  2.859428e+00  7.103572e+01  3.535687e-01  8.555620e+09
+20             2.336694e+01  1.000000e+02  1.193821e+00  7.439259e+01  7.208592e-01  8.392762e+09
+30             2.326743e+01  1.000000e+02  6.936022e-01  7.613263e+01  1.043809e+00  8.694119e+09
+40             2.322791e+01  1.000000e+02  5.026894e-01  7.726882e+01  1.421447e+00  8.512453e+09
+50             2.320027e+01  1.000000e+02  3.786560e-01  7.809616e+01  1.838720e+00  8.225832e+09
+60             2.317170e+01  1.000000e+02  3.058377e-01  7.873859e+01  2.197292e+00  8.260166e+09
+70             2.313799e+01  1.000000e+02  2.664719e-01  7.925909e+01  2.510461e+00  8.434706e+09
+80             2.309841e+01  1.000000e+02  2.433865e-01  7.969374e+01  2.842659e+00  8.513155e+09
+90             2.305380e+01  1.000000e+02  2.221345e-01  8.006502e+01  3.150992e+00  8.640137e+09
+100            2.291764e+01  1.000000e+02  2.026479e-01  8.038780e+01  3.486769e+00  8.675653e+09

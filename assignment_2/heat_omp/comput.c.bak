@@ -75,7 +75,7 @@ void do_compute(const struct parameters* p, struct results *r)
         // Note that i and j are private by default, i because of pragma and j because it's declared inside the parallel loop
         #pragma omp parallel for \
         num_threads(p->nthreads)\
-        \
+        schedule(static)\
         reduction(max: maxdiff)\
         /* compute */
         for (i = 1; i < h - 1; ++i)
