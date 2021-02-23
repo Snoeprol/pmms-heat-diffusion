@@ -7,17 +7,8 @@
 #include "omp.h"
 #include "ref1.c"
 
-/* TODO:
-- Please note that you need to set t he number of threads on CLI or in input.c
-- Add check for num threads (and warning)
--
--
-*/
-
 void do_compute(const struct parameters* p, struct results *r)
 {
-    /* ... */
-
     size_t i, j;
 
     /* alias input parameters */
@@ -65,17 +56,25 @@ void do_compute(const struct parameters* p, struct results *r)
 
     for (iter = 1; iter <= p->maxiter; ++iter)
     {
+        struct timeval start;
+        struct timeval end;
+        gettimeofday(&start, 0);
         /* swap source and destination */
         { void *tmp = src; src = dst; dst = tmp; }
 
         /* initialize halo on source */
         do_copy(h, w, src);
+         /* End of sequential time */
+        gettimeofday(&end, 0);
+        double rtime = (end.tv_sec + (end.tv_usec / 1000000.0)) -
+                    (start.tv_sec + (start.tv_usec / 1000000.0));
+        printf("this took: %d seconds\n",rtime);
 
         double maxdiff = 0.0;
         // Note that i and j are private by default, i because of pragma and j because it's declared inside the parallel loop
         #pragma omp parallel for \
         num_threads(p->nthreads)\
-        schedule(static)\
+        \
         reduction(max: maxdiff)\
         /* compute */
         for (i = 1; i < h - 1; ++i)
@@ -102,6 +101,9 @@ void do_compute(const struct parameters* p, struct results *r)
            fill_report(p, r, h, w, dst, src, iter, &before);
             if(p->printreports) report_results(p, r);
         }
+        //#ifdef GEN_PICTURES
+        //do_draw(p, iter, h, w, src);
+        //#endif
     }
 
     /* report at end in all cases */
