@@ -33,6 +33,7 @@ void *threadwork(void *param)
 {
     static const double c_cdir = 0.25 * M_SQRT2 / (M_SQRT2 + 1.0);
     static const double c_cdiag = 0.25 / (M_SQRT2 + 1.0);
+
     /* Get all values from parameter struct */
     thread_param *thread_parameters = (thread_param*) param;
     size_t i, j, iter;
@@ -59,7 +60,7 @@ void *threadwork(void *param)
 
         double maxdiff = 0.0;
 
-        // pthread_barrier_wait(&barrier);
+        pthread_barrier_wait(&barrier);
         /* compute */
         for (i = start_row; i < end_row; ++i)
             for (j = 1; j < w - 1; ++j)
@@ -79,16 +80,13 @@ void *threadwork(void *param)
                 if (diff > maxdiff) maxdiff = diff;
             }
            thread_parameters->results->maxdiff=maxdiff;
-        if(maxdiff < thread_parameters->parameters->threshold){iter++;break;}
+        // if(maxdiff < thread_parameters->parameters->threshold){iter++;break;}
         /* conditional reporting */
-        if (thread_parameters->id == 0) printf("thread %d iter = %d\n",thread_parameters->id, iter);
+        // if (thread_parameters->id < 2) printf("thread %d iter = %d\n",thread_parameters->id, iter);
         if (thread_parameters->id == 0 && iter % thread_parameters->parameters->period == 0) {
            fill_report(thread_parameters->parameters, thread_parameters->results, h, w, dst, src, iter, thread_parameters->before);
             if(thread_parameters->parameters->printreports) report_results(thread_parameters->parameters, thread_parameters->results);
         }
-        //#ifdef GEN_PICTURES
-        //do_draw(p, iter, h, w, src);
-        //#endif
     }
 }
 
@@ -162,8 +160,6 @@ void do_compute(const struct parameters *p, struct results *r)
     }
 
     pthread_t pthreads[num_threads];
-    pthread_barrierattr_t attr;
-    unsigned count;
     int ret;
     ret = pthread_barrier_init(&barrier, NULL, num_threads);
 
