@@ -42,7 +42,6 @@ static int fill_report(const struct parameters *p, struct results *r,
     /* compute min/max/avg */
     double tmin = INFINITY, tmax = -INFINITY;
     double sum = 0.0;
-    double maxdiff = 0.0;
     struct timespec after;
 
     /* We have said that the final reduction does not need to be included. */
