@@ -8,7 +8,7 @@
 #include "compute.h"
 #include "ref1.c"
 
- pthread_barrier_t barrier;
+pthread_barrier_t barrier;
 
 /* Struct with parameters for each thread */
 typedef struct thread_param
