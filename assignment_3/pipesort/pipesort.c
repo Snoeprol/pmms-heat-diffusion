@@ -14,7 +14,7 @@ typedef struct thread_parameters{
     // add some lock to the buffer
 } thread_parameters;
 
-int buffer_size = 5;
+int buffer_length = 5;
 pthread_t *threads;
 
 void test_function(int i) {
@@ -31,6 +31,7 @@ void generate_numbers(int *length) {
 
     /* Create first comparator */
     // Maybe this should be after number generation but i think it's better to have the thread running and then "send" a number
+    // Wait not even sure we're sending stuff hhere or just let it pick from the buffer
     int i = 420;
     pthread_create(&threads[1], NULL, test_function, i);
 
@@ -67,14 +68,12 @@ int main(int argc, char *argv[]){
     /* Read command-line options. */
     while((c = getopt(argc, argv, "b:l:s:")) != -1) {
         switch(c) {
-            case 'l':
-                length = atol(optarg);
-                break;
             case 's':
                 seed = atoi(optarg);
                 break;
-            case 'b':
-                buffer_size = atoi(optarg);
+            case 'l':
+                buffer_length = atoi(optarg);
+                break;
             case '?':
             if (optopt == 'b' ||
                 optopt == 'l' ||
@@ -104,7 +103,7 @@ int main(int argc, char *argv[]){
 
     clock_gettime(CLOCK_MONOTONIC, &before);
 
-    pthread_create(&threads[0], NULL, generate_numbers, length);
+    pthread_create(&threads[0], NULL, generate_numbers, buffer_length);
 
 
     /* Wait for first thread to finish */
