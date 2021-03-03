@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <errno.h>
+#include <pthread.h>
+#include <math.h>
 
 void die(const char *msg){
     if (errno != 0) 
@@ -74,8 +76,97 @@ void print_image(int num_rows, int num_cols, int * image){
 	printf("\n");
 }
 
-void histogram(int * histo, int * image){
-    //TODO: For Students
+typedef struct Params{
+    int start_element, end_element;
+    void * img;
+} Params;
+
+void * do_part(void * params){
+    /* Convert void to actual params */
+    Params * params_pointer = (Params *) params;
+    Params parameters = * params_pointer;
+    // printf("start elem: %i\n", parameters.start_element);
+    // printf("%i\n", parameters.end_element);
+    int img_val = 2;
+    int hist[256] = {0};
+    int start_element = parameters.start_element;
+    int end_element = parameters.end_element;
+    int (*array_2d)[] = (int (*)[])parameters.img;
+    printf("new img values %i\n", (*array_2d)[10]);
+    for (int i = start_element; i < end_element; i++){
+        //printf("%i", i);
+        //printf("%i\n",(*array_2d)[i]);
+        //printf("value of im: %i",(*array_2d)[i]);
+        hist[(*array_2d)[i]] += 1;
+    }
+    // int hist_sum = 0;
+    // for (int i = 0; i < 256; i++){
+    // printf("hist val: %i\n", hist[i]);
+    // hist_sum += hist[i];
+    // }
+    // printf("hist sum: %i\n", hist_sum);
+    return hist;
+}
+
+void * hello_world(void * value){
+    int * params_pointer = (int *) value;
+    int parameters = * params_pointer;
+    printf("thread id: %i\n", parameters);
+    return parameters;
+}
+
+void histogram(int * histo, int * image, int threads, int elems){
+    /* Create bins and set to zero */
+    void * results[threads];
+    pthread_t thread_ids [threads];
+    //int pthread_barrier_init(pthread_barrier_t *restrict barrier,const pthread_barrierattr_t *restrict attr, unsigned count);
+
+
+    int elems_per_thread = (int) (elems/threads) + 1;
+    int start_element;
+    int end_element;
+
+
+    Params params[threads];
+    for (int i = 0; i < threads; i++){
+        //printf("%i\n", i);
+        start_element = i * elems_per_thread;
+        if (i != threads - 1){
+            end_element = (i + 1) * elems_per_thread;  
+            //printf("after if statement %i\n", end_element);
+        } else {
+            end_element = elems;
+        }
+    
+        /* Maybe check if last thread has elements */
+        params[i].start_element = start_element;
+        params[i].end_element = end_element;
+        params[i].img = image;
+    
+         void * input_pointer = &params[i];
+
+        /* Create Ze Tread */
+        //printf("%i, %i, %i\n", params[i].start_element, params[i].end_element, params[i].img);
+        pthread_create(&thread_ids[i], NULL, &do_part, input_pointer);
+        printf("Thread %i created\n", i);
+    }
+    printf("kk\n");
+    for (int i = 0; i < threads; i ++) {
+        pthread_join(thread_ids[i] , &results[i]);
+        int (*hist_i)[256] = (int (*)[256]) results[i];
+
+        printf("array2d: %i, %i\n", (*hist_i)[i], i);
+        //int result_params[256] = * p_pointer;
+        for (int j = 0; j < 256; j ++){
+
+            //printf("array2d: %i, %i\n", (*hist_i)[j], i);
+            //printf("%i\n", hist_i);
+            //histo[i] += (*array_2d)[i];
+            //printf("Name: %i, Rating: %i, Ripped: false\n", histo[i], parameters.hist[i]);
+        }
+        //free(result);
+    }
+
 }
 
 int main(int argc, char *argv[]){
@@ -85,7 +176,7 @@ int main(int argc, char *argv[]){
     image_path ="../../../images/pat1_100x150.pgm";
     int gen_image = 0;
     int debug = 0;
-
+    int threads = 4;
     int num_rows = 150;
     int num_cols = 100;
 
@@ -94,8 +185,11 @@ int main(int argc, char *argv[]){
     int * histo = (int *) calloc(256, sizeof(int));
 
     /* Read command-line options. */
-    while((c = getopt(argc, argv, "s:ip:n:m:g")) != -1) {
+    while((c = getopt(argc, argv, "s:i:p:n:m:g:t")) != -1) {
         switch(c) {
+            case 'c':
+                threads = atoi(optarg);
+                break;
             case 's':
                 seed = atoi(optarg);
                 break;
@@ -135,8 +229,7 @@ int main(int argc, char *argv[]){
     clock_gettime(CLOCK_MONOTONIC, &before);
     /* Do your thing here */
 
-
-    histogram(histo, image);
+    histogram(histo, image, threads, num_rows * num_cols);
 
     /* Do your thing here */
 

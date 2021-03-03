@@ -12,6 +12,8 @@
         "string_view": "c",
         "initializer_list": "c",
         "ranges": "c",
-        "functional": "c"
+        "functional": "c",
+        "pthread.h": "c",
+        "errno.h": "c"
     }
 }

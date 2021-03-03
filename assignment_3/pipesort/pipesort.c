@@ -115,12 +115,13 @@ void compare(void * params)
             switch (state){
                 /* Initial state */
                 case 0:
+
                     sem_wait(&occupied);
                     sem_wait(&c_lock);
 
                     val = parameters.buffer.numbers[parameters.buffer->nextout];
                     parameters.buffer->nextout = (parameters.buffer->nextout + 1) % SIZE_OF_BUFFER;
-
+                    
                     sem_post(&c_lock);
                     sem_post(&occupied);
 
