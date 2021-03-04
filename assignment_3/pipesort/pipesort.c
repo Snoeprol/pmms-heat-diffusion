@@ -25,11 +25,12 @@ typedef struct thread_parameters{
 int buffer_length = 5;
 pthread_t *threads;
 
-void comparator(void* input) {
+void *comparator(void *input) {
     /* Unpack input thread parameters */
     thread_parameters *thread_param = (thread_parameters*) input;
     int *buffer_in = thread_param->buffer;
-    int *next_out = thread_param->next_out;
+    // or get nextout from struct ?
+    int next_out = 0;
     sem_t *occupied = thread_param->occupied;
     sem_t *empty = thread_param->empty;
 
@@ -45,7 +46,28 @@ void comparator(void* input) {
                      // But i'm not sure if that's necessary because it can be included during sending
 
     comparator_state STATE = INIT;
+    int x = 0;
+    while(STATE != END) {
+        /* Always read value from buffer_in first */
+        // sem_wait(occupied);
+        current_val = buffer_in[next_out];
+        next_out = ++next_out % buffer_length;
+        // sem_post(empty);
 
+        if (STATE == INIT) {
+            previous_val = current_val;
+            STATE = COMPARE_NEW;
+            printf("Set state from INIT to COMPARE_NEW\n");
+        }
+
+        if (STATE == COMPARE_NEW) {
+            
+            STATE = END;
+        }
+    }
+    // sem_destroy(empty);
+    // sem_destroy(occupied);
+    printf("While loop finsihed\n");
 
 }
 
@@ -67,7 +89,7 @@ void generate_numbers(int *length) {
     thread_param.buffer = buffer;
     thread_param.occupied = occupied;
     thread_param.empty = empty;
-    pthread_create(&threads[1], NULL, comparator, &thread_param);
+    pthread_create(&threads[0], NULL, (void*) comparator, &thread_param);
 
     /* Generate nubmers and send? */
     for (size_t i = 0; i < buffer_length; i++)
@@ -79,17 +101,13 @@ void generate_numbers(int *length) {
     }
 
     /* Generate ends */
-    for (size_t i = 0; i < buffer_length; i++)
-    {
-        // sem_wait(empty);
-        buffer[buffer_location] = -1;
-        buffer_location = ++buffer_location % buffer_length;
-        // sem_wait(occupied);
-    }
-
-
-
-
+    // for (size_t i = 0; i < 2; i++)
+    // {
+    //     sem_wait(empty);
+    //     buffer[buffer_location] = -1;
+    //     buffer_location = ++buffer_location % buffer_length;
+    //     sem_wait(occupied);
+    // }
 
 }
 
@@ -141,17 +159,19 @@ int main(int argc, char *argv[]){
 
     clock_gettime(CLOCK_MONOTONIC, &before);
 
-    pthread_create(&threads[0], NULL, generate_numbers, buffer_length);
+    pthread_create(&threads[0], NULL, (void*) generate_numbers, buffer_length);
 
-
-    /* Wait for first thread to finish */
     pthread_join(threads[0], NULL);
-
+    /* Wait for first thread to finish */
+    // for (int id = 1; id < 2; id++)
+    // {
+    //     pthread_join(threads[i], NULL);
+    // }
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
                   (double)(after.tv_nsec - before.tv_nsec) / 1e9;
-
     printf("Pipesort took: % .6e seconds \n", time);
+    return 0;
 
 }
