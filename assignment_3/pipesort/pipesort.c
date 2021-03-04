@@ -10,6 +10,9 @@
 #include <errno.h>
 #include "semaphore.h"
 
+/* States of a comparator thread */
+typedef enum {INIT, COMPARE, COMPARE_NEW, END} comparator_state;
+
 typedef struct thread_parameters{
     int *buffer;
     int *next_in;
@@ -23,18 +26,37 @@ int buffer_length = 5;
 pthread_t *threads;
 
 void comparator(void* input) {
+    /* Unpack input thread parameters */
     thread_parameters *thread_param = (thread_parameters*) input;
+    int *buffer_in = thread_param->buffer;
+    int *next_out = thread_param->next_out;
+    sem_t *occupied = thread_param->occupied;
+    sem_t *empty = thread_param->empty;
 
-    printf("Test function printing \n");
+    int previous_val;
+    int current_val;
+
+    int *buffer_out = malloc(sizeof(int) * buffer_length);
+    sem_t *out_buffer_occupied = malloc(sizeof(sem_t));
+    sem_t *out_buffer_empty = malloc(sizeof(sem_t));
+    sem_init(out_buffer_occupied, 0, 0);
+    sem_init(out_buffer_empty, 0, buffer_length);
+    int next_in = 0; // In the slides they have a next in and next out int he buffcer parameter
+                     // But i'm not sure if that's necessary because it can be included during sending
+
+    comparator_state STATE = INIT;
+
+
 }
 
 void generate_numbers(int *length) {
+    /* Create local buffer */
     int buffer_length = length;
     printf("Creating buffer of length = %d\n", buffer_length);
-
     int *buffer = malloc(sizeof(int) * buffer_length);
     int buffer_location = 0;
 
+    /* Initialize locks (we use semaphores) */
     sem_t *occupied = malloc(sizeof(sem_t));
     sem_t *empty = malloc(sizeof(sem_t));
     sem_init(occupied, 0, 0);
@@ -47,7 +69,7 @@ void generate_numbers(int *length) {
     thread_param.empty = empty;
     pthread_create(&threads[1], NULL, comparator, &thread_param);
 
-    /*Generate nubmers and send?*/
+    /* Generate nubmers and send? */
     for (size_t i = 0; i < buffer_length; i++)
     {
         sem_wait(empty);
@@ -59,8 +81,10 @@ void generate_numbers(int *length) {
     /* Generate ends */
     for (size_t i = 0; i < buffer_length; i++)
     {
+        // sem_wait(empty);
         buffer[buffer_location] = -1;
         buffer_location = ++buffer_location % buffer_length;
+        // sem_wait(occupied);
     }
 
 
