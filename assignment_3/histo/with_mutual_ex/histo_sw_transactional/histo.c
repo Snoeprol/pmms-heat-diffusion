@@ -5,12 +5,11 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <errno.h>
-#include "semaphore.h"
 #include <pthread.h>
+#include <math.h>
+#include "semaphore.h"
 
-
-__attribute__ ((transaction_safe))
-void * inc_histo(void * params);
+pthread_barrier_t   barrier; // the barrier synchronization object
 
 void die(const char *msg){
     if (errno != 0) 
@@ -86,42 +85,54 @@ typedef struct Params{
     void * histo;
 } Params;
 
-void * inc_histo(void * histo){
-    /* Cast to array in */
+__attribute__((transaction_safe))
+void increase_hist(int * hist, int bin){
+    hist[bin] += 1;
 }
 
-void * histo_thread(void * params){
+void * do_part(void * params){
+
     /* Convert void to actual params */
     Params * params_pointer = (Params *) params;
     Params parameters = * params_pointer;
+    int (*hist)[256] = (int (*)[256])parameters.histo;
+    int start_element = parameters.start_element;
+    int end_element = parameters.end_element;
+    int (*image_arr)[] = (int (*)[])parameters.img;
 
-    for (int i = parameters.start_element; i < parameters.end_element; i++){
-    /* Don't know how access real histo here :( */
-    __transaction_atomic {
-    parameters.histo[parameters.img[i]] += 1;
+    for (int i = start_element; i < end_element; i++){
+        __transaction_atomic{
+        increase_hist(parameters.histo,(*image_arr)[i]);
+        }
     }
+
+    int hist_sum = 0;
+    for (int i = 0; i < 256; i++){
+    hist_sum += (*hist)[i];
     }
+    printf("hist sum: %i\n", hist_sum);
+    pthread_barrier_wait(&barrier);
 }
 
 void histogram(int * histo, int * image, int threads, int elems){
     /* Create bins and set to zero */
-    int * result;
+    void * results[threads];
     pthread_t thread_ids [threads];
 
+    pthread_barrier_init (&barrier, NULL, threads + 1);
     int elems_per_thread = (int) (elems/threads) + 1;
     int start_element;
     int end_element;
-    
-    /* Make barrier */
-    int pthread_barrier_init (pthread_barrier_t * barrier , 
-    const pthread_barrierattr_t * attr , unsigned int count);
-
+    /* Barrier */
+    pthread_barrier_init (&barrier, NULL, threads + 1);
 
     Params params[threads];
     for (int i = 0; i < threads; i++){
+        //printf("%i\n", i);
         start_element = i * elems_per_thread;
         if (i != threads - 1){
             end_element = (i + 1) * elems_per_thread;  
+            //printf("after if statement %i\n", end_element);
         } else {
             end_element = elems;
         }
@@ -129,17 +140,24 @@ void histogram(int * histo, int * image, int threads, int elems){
         /* Maybe check if last thread has elements */
         params[i].start_element = start_element;
         params[i].end_element = end_element;
-        params[i].img = &image;
-        params[i].histo = &histo;
-    
-         void * input_pointer = &params[i];
-
+        params[i].img = image;
+        params[i].histo = histo;
+        void * input_pointer = &params[i];
+        
         /* Create Ze Tread */
-        //printf("%i, %i, %i\n", params[i].start_element, params[i].end_element, params[i].img);
-        pthread_create(&thread_ids[i], NULL, &histo_thread, input_pointer);
+        pthread_create(&thread_ids[i], NULL, &do_part, input_pointer);
     }
-    int pthread_barrier_wait(pthread_barrier_t * barrier );int pthread_barrier_wait ( pthread_barrier_t * barrier );
 
+    pthread_barrier_wait (&barrier);
+    // for (int i = 0; i < threads; i ++) {
+    //     pthread_join(thread_ids[i] , &results[i]);
+    // }
+    int pixels = 0;
+    for (int j = 0; j < 256; j ++){
+        pixels += histo[j];
+    }
+
+    printf("pixesl: %i\n", pixels);
 }
 
 int main(int argc, char *argv[]){
@@ -149,17 +167,16 @@ int main(int argc, char *argv[]){
     image_path ="../../../../images/pat1_100x150.pgm";
     int gen_image = 0;
     int debug = 0;
-
+    int threads = 5;
     int num_rows = 150;
     int num_cols = 100;
-    int threads = 4;
 
     struct timespec before, after;
 
     int * histo = (int *) calloc(256, sizeof(int));
 
     /* Read command-line options. */
-    while((c = getopt(argc, argv, "s:ip:n:m:g:c")) != -1) {
+    while((c = getopt(argc, argv, "s:i:p:n:m:g:t")) != -1) {
         switch(c) {
             case 'c':
                 threads = atoi(optarg);
@@ -202,7 +219,6 @@ int main(int argc, char *argv[]){
 
     clock_gettime(CLOCK_MONOTONIC, &before);
     /* Do your thing here */
-
 
     histogram(histo, image, threads, num_rows * num_cols);
 

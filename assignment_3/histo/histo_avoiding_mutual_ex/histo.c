@@ -79,40 +79,28 @@ void print_image(int num_rows, int num_cols, int * image){
 typedef struct Params{
     int start_element, end_element;
     void * img;
+    void * hist;
 } Params;
 
 void * do_part(void * params){
     /* Convert void to actual params */
     Params * params_pointer = (Params *) params;
     Params parameters = * params_pointer;
-    // printf("start elem: %i\n", parameters.start_element);
-    // printf("%i\n", parameters.end_element);
-    int img_val = 2;
-    int hist[256] = {0};
+    int (*hist)[256] = (int (*)[256])parameters.hist;
     int start_element = parameters.start_element;
     int end_element = parameters.end_element;
-    int (*array_2d)[] = (int (*)[])parameters.img;
-    printf("new img values %i\n", (*array_2d)[10]);
-    for (int i = start_element; i < end_element; i++){
-        //printf("%i", i);
-        //printf("%i\n",(*array_2d)[i]);
-        //printf("value of im: %i",(*array_2d)[i]);
-        hist[(*array_2d)[i]] += 1;
-    }
-    // int hist_sum = 0;
-    // for (int i = 0; i < 256; i++){
-    // printf("hist val: %i\n", hist[i]);
-    // hist_sum += hist[i];
-    // }
-    // printf("hist sum: %i\n", hist_sum);
-    return hist;
-}
+    int (*image_arr)[] = (int (*)[])parameters.img;
 
-void * hello_world(void * value){
-    int * params_pointer = (int *) value;
-    int parameters = * params_pointer;
-    printf("thread id: %i\n", parameters);
-    return parameters;
+    for (int i = start_element; i < end_element; i++){
+        (*hist)[(*image_arr)[i]] += 1;
+    }
+
+    int hist_sum = 0;
+    for (int i = 0; i < 256; i++){
+    hist_sum += (*hist)[i];
+    }
+    printf("hist sum: %i\n", hist_sum);
+    return params;
 }
 
 void histogram(int * histo, int * image, int threads, int elems){
@@ -142,31 +130,28 @@ void histogram(int * histo, int * image, int threads, int elems){
         params[i].start_element = start_element;
         params[i].end_element = end_element;
         params[i].img = image;
-    
-         void * input_pointer = &params[i];
+        params[i].hist = calloc(256, sizeof(int));
+        void * input_pointer = &params[i];
 
         /* Create Ze Tread */
         //printf("%i, %i, %i\n", params[i].start_element, params[i].end_element, params[i].img);
         pthread_create(&thread_ids[i], NULL, &do_part, input_pointer);
-        printf("Thread %i created\n", i);
     }
-    printf("kk\n");
+    int pixels = 0;
     for (int i = 0; i < threads; i ++) {
         pthread_join(thread_ids[i] , &results[i]);
-        int (*hist_i)[256] = (int (*)[256]) results[i];
+        Params * params_pointer = (Params *) results[i];
+        Params parameters = * params_pointer;
+        int (*hist_i)[] = (int (*)[]) parameters.hist;
 
-        printf("array2d: %i, %i\n", (*hist_i)[i], i);
-        //int result_params[256] = * p_pointer;
         for (int j = 0; j < 256; j ++){
 
-            //printf("array2d: %i, %i\n", (*hist_i)[j], i);
-            //printf("%i\n", hist_i);
-            //histo[i] += (*array_2d)[i];
-            //printf("Name: %i, Rating: %i, Ripped: false\n", histo[i], parameters.hist[i]);
+            pixels += (*hist_i)[j];
+            histo[j] += (*hist_i)[j];
         }
-        //free(result);
+        //free(result)
     }
-
+    printf("%i\n", pixels);
 }
 
 int main(int argc, char *argv[]){
@@ -175,7 +160,7 @@ int main(int argc, char *argv[]){
     const char *image_path = 0;
     image_path ="../../../images/pat1_100x150.pgm";
     int gen_image = 0;
-    int debug = 0;
+    int debug = 1;
     int threads = 4;
     int num_rows = 150;
     int num_cols = 100;
