@@ -11,9 +11,16 @@
 #include "semaphore.h"
 
 /* States of a comparator thread */
-typedef enum {INIT, COMPARE, COMPARE_NEW, END} comparator_state;
+typedef enum
+{
+    INIT,
+    COMPARE,
+    COMPARE_NEW,
+    END
+} comparator_state;
 
-typedef struct thread_parameters{
+typedef struct thread_parameters
+{
     int *buffer;
     int *next_in;
     int *next_out;
@@ -23,55 +30,70 @@ typedef struct thread_parameters{
 } thread_parameters;
 
 int buffer_length = 5;
+int sequence_length = 100;
 pthread_t *threads;
+sem_t pipesort_done;
 
-void *comparator(void *input) {
+void *comparator(void *input)
+{
     /* Unpack input thread parameters */
-    thread_parameters *thread_param = (thread_parameters*) input;
+    thread_parameters *thread_param = (thread_parameters *)input;
     int *buffer_in = thread_param->buffer;
-    // or get nextout from struct ?
+    // TODO or get nextout from struct ?
     int next_out = 0;
     sem_t *occupied = thread_param->occupied;
     sem_t *empty = thread_param->empty;
 
+    /* Two values of comparator instance */
     int previous_val;
     int current_val;
 
+    /* Create output buffer and its semaphores */
     int *buffer_out = malloc(sizeof(int) * buffer_length);
     sem_t *out_buffer_occupied = malloc(sizeof(sem_t));
     sem_t *out_buffer_empty = malloc(sizeof(sem_t));
-    sem_init(out_buffer_occupied, 0, 0);
-    sem_init(out_buffer_empty, 0, buffer_length);
+    if (sem_init(out_buffer_occupied, 0, 0))
+        printf("Seminit error 1");
+    if (sem_init(out_buffer_empty, 0, buffer_length))
+        printf("Seminit error 2");
     int next_in = 0; // In the slides they have a next in and next out int he buffcer parameter
                      // But i'm not sure if that's necessary because it can be included during sending
 
     comparator_state STATE = INIT;
     int x = 0;
-    while(STATE != END) {
+    while (STATE != END)
+    {
         /* Always read value from buffer_in first */
-        // sem_wait(occupied);
+        sem_wait(occupied);
         current_val = buffer_in[next_out];
+        printf("Current val = %d\n", current_val);
         next_out = ++next_out % buffer_length;
-        // sem_post(empty);
+        sem_post(empty);
 
-        if (STATE == INIT) {
+        if (STATE == INIT)
+        {
             previous_val = current_val;
             STATE = COMPARE_NEW;
             printf("Set state from INIT to COMPARE_NEW\n");
         }
 
-        if (STATE == COMPARE_NEW) {
-            
-            STATE = END;
+        else if (STATE == COMPARE_NEW)
+        {
+            x++;
+            if (x ==5)
+                STATE = END;
         }
     }
-    // sem_destroy(empty);
-    // sem_destroy(occupied);
+    sem_destroy(empty);
+    sem_destroy(occupied);
+    // free(empty);
+    // free(occupied);
     printf("While loop finsihed\n");
-
+    sem_post(&pipesort_done);
 }
 
-void generate_numbers(int *length) {
+void generate_numbers(int *length)
+{
     /* Create local buffer */
     int buffer_length = length;
     printf("Creating buffer of length = %d\n", buffer_length);
@@ -89,10 +111,10 @@ void generate_numbers(int *length) {
     thread_param.buffer = buffer;
     thread_param.occupied = occupied;
     thread_param.empty = empty;
-    pthread_create(&threads[0], NULL, (void*) comparator, &thread_param);
+    pthread_create(&threads[1], NULL, (void *)comparator, &thread_param);
 
     /* Generate nubmers and send? */
-    for (size_t i = 0; i < buffer_length; i++)
+    for (size_t i = 0; i < sequence_length; i++)
     {
         sem_wait(empty);
         buffer[buffer_location] = rand();
@@ -108,29 +130,31 @@ void generate_numbers(int *length) {
     //     buffer_location = ++buffer_location % buffer_length;
     //     sem_wait(occupied);
     // }
-
 }
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
     int c;
     int seed = 42;
     long length = 1e4;
 
     struct timespec before;
-    struct timespec  after;
-
-
+    struct timespec after;
 
     /* Read command-line options. */
-    while((c = getopt(argc, argv, "b:l:s:")) != -1) {
-        switch(c) {
-            case 's':
-                seed = atoi(optarg);
-                break;
-            case 'l':
-                buffer_length = atoi(optarg);
-                break;
-            case '?':
+    while ((c = getopt(argc, argv, "b:l:s:")) != -1)
+    {
+        switch (c)
+        {
+        case 's':
+            seed = atoi(optarg);
+            break;
+        case 'b':
+            sequence_length = atoi(optarg);
+        case 'l':
+            buffer_length = atoi(optarg);
+            break;
+        case '?':
             if (optopt == 'b' ||
                 optopt == 'l' ||
                 optopt == 's')
@@ -151,6 +175,7 @@ int main(int argc, char *argv[]){
         }
     }
 
+    sem_init(&pipesort_done, 0, 0);
     /* Seed such that we can always reproduce the same random vector */
     srand(seed);
 
@@ -159,19 +184,20 @@ int main(int argc, char *argv[]){
 
     clock_gettime(CLOCK_MONOTONIC, &before);
 
-    pthread_create(&threads[0], NULL, (void*) generate_numbers, buffer_length);
+    pthread_create(&threads[0], NULL, (void *)generate_numbers, buffer_length);
 
-    pthread_join(threads[0], NULL);
-    /* Wait for first thread to finish */
+    // pthread_join(threads[0], NULL);
+    // /* Wait for first thread to finish */
     // for (int id = 1; id < 2; id++)
     // {
-    //     pthread_join(threads[i], NULL);
+    //     pthread_join(threads[id], NULL);
     // }
+    // Check if join is better than another semaphore
+    sem_wait(&pipesort_done);
 
     clock_gettime(CLOCK_MONOTONIC, &after);
     double time = (double)(after.tv_sec - before.tv_sec) +
                   (double)(after.tv_nsec - before.tv_nsec) / 1e9;
     printf("Pipesort took: % .6e seconds \n", time);
     return 0;
-
 }
