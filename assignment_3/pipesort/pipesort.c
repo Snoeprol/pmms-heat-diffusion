@@ -34,17 +34,16 @@ int sequence_length = 10;
 pthread_t *threads;
 sem_t pipesort_done;
 
-int send_largest_value(int current_val, int previous_val, int next_in_outbuf,
+int send_val(int val, int next_in_outbuf,
                        int *buffer_out, sem_t *occupied, sem_t *empty)
 {
-    int forward_value = previous_val > current_val ? current_val : previous_val;
-    printf("Sending value %d right now\n", forward_value);
+    printf("Sending value %d right now\n", val);
     sem_wait(empty);
-    buffer_out[next_in_outbuf] = forward_value;
+    buffer_out[next_in_outbuf] = val;
     next_in_outbuf = ++next_in_outbuf % buffer_length;
     sem_post(occupied);
-    
-    printf("Sent value %d \n", forward_value);
+
+    printf("Sent value %d \n", val);
 
     return next_in_outbuf;
 }
@@ -57,7 +56,6 @@ void *pipeline_print(void *p)
 
 void *comparator(void *input)
 {
-    sleep(1);
     /* Unpack input thread parameters */
     thread_parameters *thread_param = (thread_parameters *)input;
     int *buffer_in = thread_param->buffer;
@@ -67,8 +65,8 @@ void *comparator(void *input)
     sem_t *in_buffer_empty = thread_param->empty;
 
     /* Two values of comparator instance */
-    int previous_val = 0;
-    int current_val = 0;
+    int previous_val;
+    int current_val;
 
     /* Create output buffer and its semaphores */
     int *buffer_out = malloc(sizeof(int) * buffer_length);
@@ -85,12 +83,19 @@ void *comparator(void *input)
 
     while (1)
     {
+        printf("Buffer i receive: [");
         /* Always read value from buffer_in first */
         sem_wait(in_buffer_occupied);
         current_val = buffer_in[next_out];
+        for (int i = 0; i < 5; i++)
+        {
+            printf("%d ", buffer_in[i]);
+        }
+        printf("] \nAnd i pick %d\n", buffer_in[next_out]);
         printf("Current val = %d\n", current_val);
         printf("Previous val = %d\n", previous_val);
         next_out = ++next_out % buffer_length;
+
         sem_post(in_buffer_empty);
 
         if (STATE == INIT)
@@ -112,8 +117,8 @@ void *comparator(void *input)
                 pthread_create(&threads[0], NULL, pipeline_print, current_val);
 
                 /* Forward both values to next thread */
-                next_in_outbuf = send_largest_value(current_val, current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
-                next_in_outbuf = send_largest_value(previous_val, previous_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
+                next_in_outbuf = send_val(current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
+                next_in_outbuf = send_val(previous_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
                 continue;
             }
             printf("Setting state to COMPARE \n");
@@ -123,13 +128,13 @@ void *comparator(void *input)
             new_params.buffer = buffer_out;
             new_params.occupied = out_buffer_occupied;
             new_params.empty = out_buffer_empty;
-            new_params.next_in = next_in_outbuf;
 
             /* Create next comperator thread */
             pthread_create(&threads[0], NULL, comparator, &new_params);
 
-            next_in_outbuf = send_largest_value(current_val, previous_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
             previous_val = current_val > previous_val ? previous_val : current_val;
+            current_val = current_val < previous_val ? previous_val : current_val;
+            next_in_outbuf = send_val(current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
         }
 
         else if (STATE == COMPARE)
@@ -141,17 +146,18 @@ void *comparator(void *input)
                 STATE = END;
 
                 /* Forward both values to next thread */
-                next_in_outbuf = send_largest_value(current_val, current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
-                next_in_outbuf = send_largest_value(previous_val, previous_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
+                next_in_outbuf = send_val(current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
+                next_in_outbuf = send_val(previous_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
                 continue;
             }
-            next_in_outbuf = send_largest_value(current_val, previous_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
-            previous_val = previous_val > current_val ? previous_val : current_val;
+            previous_val = current_val > previous_val ? previous_val : current_val;
+            current_val = current_val < previous_val ? previous_val : current_val;
+            next_in_outbuf = send_val(current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
         }
         else if (STATE == END)
         {
             printf("Reached end state");
-            pthread_create(&threads[0], NULL, pipeline_print, current_val);
+            break;
         }
     }
     sem_destroy(in_buffer_empty);
