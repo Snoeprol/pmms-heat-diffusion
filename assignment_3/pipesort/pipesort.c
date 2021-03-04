@@ -8,17 +8,24 @@
 #include <getopt.h>
 #include <ctype.h>
 #include <errno.h>
+#include "semaphore.h"
 
 typedef struct thread_parameters{
     int *buffer;
-    // add some lock to the buffer
+    int *next_in;
+    int *next_out;
+    sem_t *occupied;
+    sem_t *empty;
+
 } thread_parameters;
 
 int buffer_length = 5;
 pthread_t *threads;
 
-void test_function(int i) {
-    printf("Test function printing\n");
+void comparator(void* input) {
+    thread_parameters *thread_param = (thread_parameters*) input;
+
+    printf("Test function printing \n");
 }
 
 void generate_numbers(int *length) {
@@ -28,18 +35,25 @@ void generate_numbers(int *length) {
     int *buffer = malloc(sizeof(int) * buffer_length);
     int buffer_location = 0;
 
+    sem_t *occupied = malloc(sizeof(sem_t));
+    sem_t *empty = malloc(sizeof(sem_t));
+    sem_init(occupied, 0, 0);
+    sem_init(empty, 0, buffer_length);
 
-    /* Create first comparator */
-    // Maybe this should be after number generation but i think it's better to have the thread running and then "send" a number
-    // Wait not even sure we're sending stuff hhere or just let it pick from the buffer
-    int i = 420;
-    pthread_create(&threads[1], NULL, test_function, i);
+    /* Fill parameter struct and create first comparator */
+    thread_parameters thread_param;
+    thread_param.buffer = buffer;
+    thread_param.occupied = occupied;
+    thread_param.empty = empty;
+    pthread_create(&threads[1], NULL, comparator, &thread_param);
 
     /*Generate nubmers and send?*/
     for (size_t i = 0; i < buffer_length; i++)
     {
+        sem_wait(empty);
         buffer[buffer_location] = rand();
         buffer_location = ++buffer_location % buffer_length;
+        sem_post(occupied);
     }
 
     /* Generate ends */
@@ -108,11 +122,6 @@ int main(int argc, char *argv[]){
 
     /* Wait for first thread to finish */
     pthread_join(threads[0], NULL);
-
-
-
-
-
 
 
     clock_gettime(CLOCK_MONOTONIC, &after);
