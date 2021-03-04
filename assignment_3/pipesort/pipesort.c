@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include "semaphore.h"
+#include <limits.h>
 
 /* States of a comparator thread */
 typedef enum
@@ -26,6 +27,7 @@ typedef struct thread_parameters
     int *next_out;
     sem_t *occupied;
     sem_t *empty;
+    int thread_id;
 
 } thread_parameters;
 
@@ -35,7 +37,7 @@ pthread_t *threads;
 sem_t pipesort_done;
 
 int send_val(int val, int next_in_outbuf,
-                       int *buffer_out, sem_t *occupied, sem_t *empty)
+             int *buffer_out, sem_t *occupied, sem_t *empty)
 {
     printf("Sending value %d right now\n", val);
     sem_wait(empty);
@@ -65,8 +67,9 @@ void *comparator(void *input)
     sem_t *in_buffer_empty = thread_param->empty;
 
     /* Two values of comparator instance */
-    int previous_val;
-    int current_val;
+    int previous_val = INT_MAX;
+    int current_val = INT_MAX;
+    int temp_val;
 
     /* Create output buffer and its semaphores */
     int *buffer_out = malloc(sizeof(int) * buffer_length);
@@ -83,11 +86,11 @@ void *comparator(void *input)
 
     while (1)
     {
-        printf("Buffer i receive: [");
         /* Always read value from buffer_in first */
         sem_wait(in_buffer_occupied);
+        printf("Thread %i receives: [", thread_param->thread_id);
         current_val = buffer_in[next_out];
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < buffer_length; i++)
         {
             printf("%d ", buffer_in[i]);
         }
@@ -128,12 +131,15 @@ void *comparator(void *input)
             new_params.buffer = buffer_out;
             new_params.occupied = out_buffer_occupied;
             new_params.empty = out_buffer_empty;
+            new_params.thread_id = thread_param->thread_id + 1;
 
             /* Create next comperator thread */
             pthread_create(&threads[0], NULL, comparator, &new_params);
 
-            previous_val = current_val > previous_val ? previous_val : current_val;
-            current_val = current_val < previous_val ? previous_val : current_val;
+            temp_val = previous_val;
+            previous_val = current_val < previous_val ? previous_val : current_val;
+            current_val = current_val < temp_val ? current_val : temp_val;
+            printf("### current_val = %d --- previous_val = %d\n", current_val, previous_val);
             next_in_outbuf = send_val(current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
         }
 
@@ -150,8 +156,10 @@ void *comparator(void *input)
                 next_in_outbuf = send_val(previous_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
                 continue;
             }
-            previous_val = current_val > previous_val ? previous_val : current_val;
-            current_val = current_val < previous_val ? previous_val : current_val;
+            temp_val = previous_val;
+            previous_val = current_val < previous_val ? previous_val : current_val;
+            current_val = current_val < temp_val ? current_val : temp_val;
+            printf("### current_val = %d --- previous_val = %d\n", current_val, previous_val);
             next_in_outbuf = send_val(current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
         }
         else if (STATE == END)
@@ -187,6 +195,7 @@ void generate_numbers(int *length)
     thread_param.buffer = buffer;
     thread_param.occupied = occupied;
     thread_param.empty = empty;
+    thread_param.thread_id = 1;
     pthread_create(&threads[0], NULL, (void *)comparator, &thread_param);
 
     size_t j;
@@ -229,9 +238,9 @@ int main(int argc, char *argv[])
             seed = atoi(optarg);
             break;
         case 'b':
-            sequence_length = atoi(optarg);
-        case 'l':
             buffer_length = atoi(optarg);
+        case 'l':
+            sequence_length = atoi(optarg);
             break;
         case '?':
             if (optopt == 'b' ||
