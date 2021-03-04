@@ -39,13 +39,13 @@ sem_t pipesort_done;
 int send_val(int val, int next_in_outbuf,
              int *buffer_out, sem_t *occupied, sem_t *empty)
 {
-    printf("Sending value %d right now\n", val);
+    // printf("Sending value %d right now\n", val);
     sem_wait(empty);
     buffer_out[next_in_outbuf] = val;
     next_in_outbuf = ++next_in_outbuf % buffer_length;
     sem_post(occupied);
 
-    printf("Sent value %d \n", val);
+    // printf("Sent value %d \n", val);
 
     return next_in_outbuf;
 }
@@ -86,6 +86,7 @@ void *comparator(void *input)
 
     while (1)
     {
+        //TODO the error starts here were sem_wait cannot proceed
         /* Always read value from buffer_in first */
         sem_wait(in_buffer_occupied);
         printf("Thread %i receives: [", thread_param->thread_id);
@@ -94,22 +95,24 @@ void *comparator(void *input)
         {
             printf("%d ", buffer_in[i]);
         }
-        printf("] \nAnd i pick %d\n", buffer_in[next_out]);
-        printf("Current val = %d\n", current_val);
-        printf("Previous val = %d\n", previous_val);
+        printf("] and i pick %d\n", buffer_in[next_out]);
+        // printf("Current val = %d\n", current_val);
+        // printf("Previous val = %d\n", previous_val);
         next_out = ++next_out % buffer_length;
 
         sem_post(in_buffer_empty);
 
         if (STATE == INIT)
         {
+            // printf("STATE = INIT\n");
             previous_val = current_val;
             STATE = COMPARE_NEW;
-            printf("Set state from INIT to COMPARE_NEW with new value %d\n", current_val);
+            // printf("Set state from INIT to COMPARE_NEW with new value %d\n", current_val);
         }
 
         else if (STATE == COMPARE_NEW)
         {
+            // printf("STATE = COMPARE_NEW\n");
             /* Check for end state */
             if (current_val == -1)
             {
@@ -124,8 +127,9 @@ void *comparator(void *input)
                 next_in_outbuf = send_val(previous_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
                 continue;
             }
-            printf("Setting state to COMPARE \n");
+
             STATE = COMPARE;
+
             /* Create new thread parameters */
             thread_parameters new_params;
             new_params.buffer = buffer_out;
@@ -139,12 +143,13 @@ void *comparator(void *input)
             temp_val = previous_val;
             previous_val = current_val < previous_val ? previous_val : current_val;
             current_val = current_val < temp_val ? current_val : temp_val;
-            printf("### current_val = %d --- previous_val = %d\n", current_val, previous_val);
+            // printf("### current_val = %d --- previous_val = %d\n", current_val, previous_val);
             next_in_outbuf = send_val(current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
         }
 
         else if (STATE == COMPARE)
         {
+            // printf("STATE = COMPARE\n");
             /* Check for end state */
             if (current_val == -1)
             {
@@ -159,13 +164,16 @@ void *comparator(void *input)
             temp_val = previous_val;
             previous_val = current_val < previous_val ? previous_val : current_val;
             current_val = current_val < temp_val ? current_val : temp_val;
-            printf("### current_val = %d --- previous_val = %d\n", current_val, previous_val);
+            // printf("### current_val = %d --- previous_val = %d\n", current_val, previous_val);
             next_in_outbuf = send_val(current_val, next_in_outbuf, buffer_out, out_buffer_occupied, out_buffer_empty);
         }
         else if (STATE == END)
         {
-            printf("Reached end state");
+            printf("STATE = END\n");
             break;
+        }
+        else {
+            printf("OHOHOHOHOHOHOOHOH\n");
         }
     }
     sem_destroy(in_buffer_empty);
@@ -204,7 +212,7 @@ void generate_numbers(int *length)
     {
         sem_wait(empty);
         buffer[buffer_location] = rand();
-        printf("Generator: I've put %d in buffer: %d\n", j, buffer[buffer_location]);
+        // printf("Generator: I've put %d in buffer: %d\n", j, buffer[buffer_location]);
         buffer_location = ++buffer_location % buffer_length;
         sem_post(occupied);
     }
@@ -215,8 +223,8 @@ void generate_numbers(int *length)
         sem_wait(empty);
         buffer[buffer_location] = -1;
         buffer_location = ++buffer_location % buffer_length;
-        sem_wait(occupied);
-        printf("Generator: I've put %d in buffer: END\n", j + i);
+        sem_post(occupied);
+        // printf("Generator: I've put %d in buffer: END\n", j + i);
     }
 }
 
