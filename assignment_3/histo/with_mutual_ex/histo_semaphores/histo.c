@@ -165,7 +165,7 @@ int main(int argc, char *argv[]){
     const char *image_path = 0;
     image_path ="../../../../images/pat1_100x150.pgm";
     int gen_image = 0;
-    int debug = 1;
+    int debug = 0;
     int threads = 4;
     int num_rows = 150;
     int num_cols = 100;
@@ -175,20 +175,19 @@ int main(int argc, char *argv[]){
     int * histo = (int *) calloc(256, sizeof(int));
 
     /* Read command-line options. */
-    while((c = getopt(argc, argv, "s:i:p:n:m:g:t")) != -1) {
+    while((c = getopt(argc, argv, "s:i:rp:n:m:g")) != -1) {
         switch(c) {
-            case 'c':
-                threads = atoi(optarg);
-                break;
             case 's':
                 seed = atoi(optarg);
                 break;
-            case 'p':
+            case 'i':
             	image_path = optarg;
             	break;
-            case 'i':
+            case 'r':
             	gen_image = 1;
             	break;
+            case 'p':
+                threads = atoi(optarg);
             case 'n':
             	num_rows = strtol(optarg, 0, 10);
             	break;
@@ -205,7 +204,6 @@ int main(int argc, char *argv[]){
                 return -1;
         }
     }
-
     int * image = (int *) malloc(sizeof(int) * num_cols * num_rows);
 
     /* Seed such that we can always reproduce the same random vector */
