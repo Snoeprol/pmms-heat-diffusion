@@ -74,13 +74,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 # Cores grids methods
 for i in range(6):
-    bars1 = bars[:, i, 0]
-    print(bars1)
-    bars2 = bars[:, i, 1]
-    print(bars2)
-    bars3 = bars[:, i, 2]
-    bars4 = bars[:, i, 3]
-    bars5 = bars[:, i, 4]
+    bars1 = bars[0,i,5]/bars[:, i, 0]
+    bars2 = bars[0,i,5]/bars[:, i, 1]
+    bars3 = bars[0,i,5]/bars[:, i, 2]
+    bars4 = bars[0,i,5]/bars[:, i, 3]
+    bars5 = bars[0,i,5]/bars[:, i, 4]
 
 
     # Set position of bar on X axis
@@ -100,13 +98,13 @@ for i in range(6):
     plt.xlabel('Threads', fontweight='bold')
     plt.xticks([r + 0.25 + barWidth for r in range(len(bars1))], ['1', '2', '4', '8', '16', '32'])
     plt.rcParams['axes.axisbelow'] = True
-    plt.ylabel('Execution time', fontweight='bold')
+    plt.ylabel('Speedup versus sequential', fontweight='bold')
     # Create legend & Show graphic
     plt.legend(loc='top left')
     plt.grid()
     plt.savefig("histo_plot" + str(i) + ".png",dpi=500)
     plt.show()
-
+'''
 for i in range(6):
     bars1 = bars[i, 0]
     bars2 = bars[i, 1]
@@ -138,3 +136,4 @@ for i in range(6):
     plt.grid()
     plt.savefig("histo_plot_different grids" + str(i) + ".png",dpi=500)
     plt.show()
+'''

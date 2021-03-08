@@ -7,7 +7,7 @@
 
 int get_random_int(int lower, int upper)
 { 
-    return (rand() % (upper - lower + 1)) + lower;
+    return 0; //(rand() % (upper - lower + 1)) + lower;
 } 
 
 int main(int argc, char **argv)
