@@ -96,14 +96,13 @@ void * do_part(void * params){
     int end_element = parameters.end_element;
     int (*image_arr)[] = (int (*)[])parameters.img;
 
+    sem_wait (&hist_lock);
     for (int i = start_element; i < end_element; i++){
-        sem_wait (&hist_lock);
 
         (*hist)[(*image_arr)[i]] += 1;
 
-        sem_post(&hist_lock);
     }
-
+    sem_post(&hist_lock);
     int hist_sum = 0;
     for (int i = 0; i < 256; i++){
     hist_sum += (*hist)[i];
@@ -188,6 +187,7 @@ int main(int argc, char *argv[]){
             	break;
             case 'p':
                 threads = atoi(optarg);
+                break;
             case 'n':
             	num_rows = strtol(optarg, 0, 10);
             	break;

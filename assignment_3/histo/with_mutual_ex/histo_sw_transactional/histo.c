@@ -85,7 +85,6 @@ typedef struct Params{
     void * histo;
 } Params;
 
-__attribute__((transaction_safe))
 void increase_hist(int * hist, int bin){
     hist[bin] += 1;
 }
@@ -101,9 +100,7 @@ void * do_part(void * params){
     int (*image_arr)[] = (int (*)[])parameters.img;
 
     for (int i = start_element; i < end_element; i++){
-        __transaction_atomic{
         increase_hist(parameters.histo,(*image_arr)[i]);
-        }
     }
 
     int hist_sum = 0;
@@ -119,7 +116,6 @@ void histogram(int * histo, int * image, int threads, int elems){
     void * results[threads];
     pthread_t thread_ids [threads];
 
-    pthread_barrier_init (&barrier, NULL, threads + 1);
     int elems_per_thread = (int) (elems/threads) + 1;
     int start_element;
     int end_element;
@@ -189,6 +185,7 @@ int main(int argc, char *argv[]){
             	break;
             case 'p':
                 threads = atoi(optarg);
+                break;
             case 'n':
             	num_rows = strtol(optarg, 0, 10);
             	break;

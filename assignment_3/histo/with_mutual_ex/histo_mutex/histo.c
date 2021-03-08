@@ -95,17 +95,14 @@ void * do_part(void * params){
     int end_element = parameters.end_element;
     int (*image_arr)[] = (int (*)[])parameters.img;
 
+
     for (int i = start_element; i < end_element; i++){
-        pthread_mutex_lock(&lock);
+            pthread_mutex_lock(&lock);
         (*hist)[(*image_arr)[i]] += 1;
-        pthread_mutex_unlock(&lock);
+            pthread_mutex_unlock(&lock);
     }
 
-    int hist_sum = 0;
-    for (int i = 0; i < 256; i++){
-    hist_sum += (*hist)[i];
-    }
-    printf("hist sum: %i\n", hist_sum);
+
     pthread_barrier_wait(&barrier);
 }
 
@@ -184,6 +181,7 @@ int main(int argc, char *argv[]){
             	break;
             case 'p':
                 threads = atoi(optarg);
+                break;
             case 'n':
             	num_rows = strtol(optarg, 0, 10);
             	break;

@@ -183,6 +183,7 @@ int main(int argc, char *argv[]){
             	break;
             case 'p':
                 threads = atoi(optarg);
+                break;
             case 'n':
             	num_rows = strtol(optarg, 0, 10);
             	break;

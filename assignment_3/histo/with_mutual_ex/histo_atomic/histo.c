@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <math.h>
-#include "semaphore.h"
+#include <stdatomic.h>
 
 pthread_barrier_t   barrier; // the barrier synchronization object
 
@@ -86,7 +86,7 @@ typedef struct Params{
 } Params;
 
 void increase_hist(int * hist, int bin){
-    hist[bin] += 1;
+    atomic_fetch_add(hist + bin, 1);
 }
 
 void * do_part(void * params){
@@ -98,11 +98,8 @@ void * do_part(void * params){
     int start_element = parameters.start_element;
     int end_element = parameters.end_element;
     int (*image_arr)[] = (int (*)[])parameters.img;
-
     for (int i = start_element; i < end_element; i++){
-        __transaction_atomic{
         increase_hist(parameters.histo,(*image_arr)[i]);
-        }
     }
 
     int hist_sum = 0;
@@ -185,9 +182,10 @@ int main(int argc, char *argv[]){
             	break;
             case 'r':
             	gen_image = 1;
-            	break;
+            	break;;
             case 'p':
                 threads = atoi(optarg);
+                break;
             case 'n':
             	num_rows = strtol(optarg, 0, 10);
             	break;
