@@ -4,7 +4,6 @@ data_array = []
 data_array_means = []
 i_array = []
 
-
 # Structure
 
 # data_array[c] accesses the core.

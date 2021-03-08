@@ -9,8 +9,8 @@
 #include <math.h>
 #include "semaphore.h"
 
-sem_t hist_lock;
-pthread_barrier_t   barrier; // the barrier synchronization object
+sem_t hist_lock[256];
+pthread_barrier_t barrier; // the barrier synchronization object
 
 void die(const char *msg){
     if (errno != 0) 
@@ -96,13 +96,12 @@ void * do_part(void * params){
     int end_element = parameters.end_element;
     int (*image_arr)[] = (int (*)[])parameters.img;
 
-    sem_wait (&hist_lock);
+
     for (int i = start_element; i < end_element; i++){
-
+        sem_wait (&hist_lock[(*image_arr)[i]]);
         (*hist)[(*image_arr)[i]] += 1;
-
+        sem_post(&hist_lock[(*image_arr)[i]]);
     }
-    sem_post(&hist_lock);
     int hist_sum = 0;
     for (int i = 0; i < 256; i++){
     hist_sum += (*hist)[i];
@@ -115,8 +114,10 @@ void histogram(int * histo, int * image, int threads, int elems){
     /* Create bins and set to zero */
     void * results[threads];
     pthread_t thread_ids [threads];
-
-    sem_init(&hist_lock , 1 , 1);
+    for (int i = 0; i < 256; i++)
+    {
+        sem_init(&hist_lock[i] , 1 , 1);
+    }
     pthread_barrier_init (&barrier, NULL, threads + 1);
     int elems_per_thread = (int) (elems/threads) + 1;
     int start_element;

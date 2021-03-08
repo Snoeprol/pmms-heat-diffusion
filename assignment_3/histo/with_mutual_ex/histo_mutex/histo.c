@@ -8,8 +8,8 @@
 #include <pthread.h>
 #include <math.h>
 
-pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-pthread_barrier_t   barrier; // the barrier synchronization object
+pthread_mutex_t lock[256] = PTHREAD_MUTEX_INITIALIZER;
+pthread_barrier_t barrier; // the barrier synchronization object
 
 
 void die(const char *msg){
@@ -97,9 +97,9 @@ void * do_part(void * params){
 
 
     for (int i = start_element; i < end_element; i++){
-            pthread_mutex_lock(&lock);
+        pthread_mutex_lock(&lock[(*image_arr)[i]]);
         (*hist)[(*image_arr)[i]] += 1;
-            pthread_mutex_unlock(&lock);
+        pthread_mutex_unlock(&lock[(*image_arr)[i]]);
     }
 
 

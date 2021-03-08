@@ -9,7 +9,7 @@
 #include <math.h>
 #include "semaphore.h"
 
-pthread_barrier_t   barrier; // the barrier synchronization object
+pthread_barrier_t barrier; // the barrier synchronization object
 
 void die(const char *msg){
     if (errno != 0) 
@@ -100,7 +100,9 @@ void * do_part(void * params){
     int (*image_arr)[] = (int (*)[])parameters.img;
 
     for (int i = start_element; i < end_element; i++){
+        __transaction_atomic {
         increase_hist(parameters.histo,(*image_arr)[i]);
+        }
     }
 
     int hist_sum = 0;
