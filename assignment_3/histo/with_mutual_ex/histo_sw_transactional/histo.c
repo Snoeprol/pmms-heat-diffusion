@@ -104,12 +104,6 @@ void * do_part(void * params){
         increase_hist(parameters.histo,(*image_arr)[i]);
         }
     }
-
-    int hist_sum = 0;
-    for (int i = 0; i < 256; i++){
-    hist_sum += (*hist)[i];
-    }
-    printf("hist sum: %i\n", hist_sum);
     pthread_barrier_wait(&barrier);
 }
 
@@ -147,15 +141,6 @@ void histogram(int * histo, int * image, int threads, int elems){
     }
 
     pthread_barrier_wait (&barrier);
-    // for (int i = 0; i < threads; i ++) {
-    //     pthread_join(thread_ids[i] , &results[i]);
-    // }
-    int pixels = 0;
-    for (int j = 0; j < 256; j ++){
-        pixels += histo[j];
-    }
-
-    printf("pixesl: %i\n", pixels);
 }
 
 int main(int argc, char *argv[]){

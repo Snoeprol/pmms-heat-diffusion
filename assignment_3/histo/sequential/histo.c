@@ -83,12 +83,6 @@ void histogram(int * histo, int * image, int threads, int elems){
     for (int i = 0; i < elems; i++){
         histo[image[i]] += 1;
     }
-    int pixels = 0;
-    for (int j = 0; j < 256; j ++){
-            pixels += histo[j];
-        }
-        //free(result)
-    printf("%i\n", pixels);
 }
 
 int main(int argc, char *argv[]){

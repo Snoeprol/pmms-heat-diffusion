@@ -101,12 +101,6 @@ void * do_part(void * params){
     for (int i = start_element; i < end_element; i++){
         increase_hist(parameters.histo,(*image_arr)[i]);
     }
-
-    int hist_sum = 0;
-    for (int i = 0; i < 256; i++){
-    hist_sum += (*hist)[i];
-    }
-    printf("hist sum: %i\n", hist_sum);
     pthread_barrier_wait(&barrier);
 }
 
@@ -124,16 +118,13 @@ void histogram(int * histo, int * image, int threads, int elems){
 
     Params params[threads];
     for (int i = 0; i < threads; i++){
-        //printf("%i\n", i);
         start_element = i * elems_per_thread;
         if (i != threads - 1){
             end_element = (i + 1) * elems_per_thread;  
-            //printf("after if statement %i\n", end_element);
         } else {
             end_element = elems;
         }
-    
-        /* Maybe check if last thread has elements */
+
         params[i].start_element = start_element;
         params[i].end_element = end_element;
         params[i].img = image;
@@ -145,15 +136,6 @@ void histogram(int * histo, int * image, int threads, int elems){
     }
 
     pthread_barrier_wait (&barrier);
-    // for (int i = 0; i < threads; i ++) {
-    //     pthread_join(thread_ids[i] , &results[i]);
-    // }
-    int pixels = 0;
-    for (int j = 0; j < 256; j ++){
-        pixels += histo[j];
-    }
-
-    printf("pixesl: %i\n", pixels);
 }
 
 int main(int argc, char *argv[]){

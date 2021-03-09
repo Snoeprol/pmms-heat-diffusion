@@ -94,12 +94,6 @@ void * do_part(void * params){
     for (int i = start_element; i < end_element; i++){
         (*hist)[(*image_arr)[i]] += 1;
     }
-
-    int hist_sum = 0;
-    for (int i = 0; i < 256; i++){
-    hist_sum += (*hist)[i];
-    }
-    printf("hist sum: %i\n", hist_sum);
     return params;
 }
 
@@ -107,9 +101,6 @@ void histogram(int * histo, int * image, int threads, int elems){
     /* Create bins and set to zero */
     void * results[threads];
     pthread_t thread_ids [threads];
-    //int pthread_barrier_init(pthread_barrier_t *restrict barrier,const pthread_barrierattr_t *restrict attr, unsigned count);
-
-
     int elems_per_thread = (int) (elems/threads) + 1;
     int start_element;
     int end_element;
@@ -143,15 +134,7 @@ void histogram(int * histo, int * image, int threads, int elems){
         Params * params_pointer = (Params *) results[i];
         Params parameters = * params_pointer;
         int (*hist_i)[] = (int (*)[]) parameters.hist;
-
-        for (int j = 0; j < 256; j ++){
-
-            pixels += (*hist_i)[j];
-            histo[j] += (*hist_i)[j];
-        }
-        //free(result)
     }
-    printf("%i\n", pixels);
 }
 
 int main(int argc, char *argv[]){
