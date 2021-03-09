@@ -1,0 +1,81 @@
+2
+Correctness 1
+1.228480e+00
+2
+Correctness 1
+1.197297e+00
+2
+Correctness 1
+1.265595e+00
+4
+Correctness 1
+1.018317e+00
+4
+Correctness 1
+8.953037e-01
+4
+Correctness 1
+9.661792e-01
+6
+Correctness 1
+8.005992e-01
+6
+8.002901e-01
+Correctness 1
+6
+Correctness 1
+8.555664e-01
+8
+7.192203e-01
+Correctness 1
+8
+Correctness 1
+7.468550e-01
+8
+Correctness 1
+7.567368e-01
+10
+Correctness 1
+6.719815e-01
+10
+Correctness 1
+7.275359e-01
+10
+7.597068e-01
+Correctness 1
+12
+Correctness 1
+6.880663e-01
+12
+Correctness 1
+6.638131e-01
+12
+6.923675e-01
+Correctness 1
+15
+Correctness 1
+6.690167e-01
+15
+Correctness 1
+6.713173e-01
+15
+Correctness 1
+7.677268e-01
+20
+Correctness 1
+6.197010e-01
+20
+Correctness 1
+6.638021e-01
+20
+Correctness 1
+6.425183e-01
+25
+5.355365e-01
+Correctness 1
+25
+Correctness 1
+5.684952e-01
+25
+Correctness 1
+6.390390e-01
