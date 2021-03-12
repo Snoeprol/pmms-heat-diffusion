@@ -107,11 +107,9 @@ void histogram(int * histo, int * image, int threads, int elems){
 
     Params params[threads];
     for (int i = 0; i < threads; i++){
-        //printf("%i\n", i);
         start_element = i * elems_per_thread;
         if (i != threads - 1){
             end_element = (i + 1) * elems_per_thread;  
-            //printf("after if statement %i\n", end_element);
         } else {
             end_element = elems;
         }
@@ -124,7 +122,6 @@ void histogram(int * histo, int * image, int threads, int elems){
         void * input_pointer = &params[i];
 
         /* Create Ze Tread */
-        //printf("%i, %i, %i\n", params[i].start_element, params[i].end_element, params[i].img);
         pthread_create(&thread_ids[i], NULL, &do_part, input_pointer);
     }
     int pixels = 0;

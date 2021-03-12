@@ -9,6 +9,7 @@
 #include "ref1.c"
 
 pthread_barrier_t barrier;
+int num_threads;
 
 /* Struct with parameters for each thread */
 typedef struct thread_param
@@ -18,7 +19,6 @@ typedef struct thread_param
     int row_end;
     int maxiter;
     size_t *iter;
-
     struct results *results;
     struct parameters *parameters;
     struct timeval *before;
@@ -26,15 +26,16 @@ typedef struct thread_param
     double **src;
     double **dst;
     double **cond;
+    double *maxdiff_locals;
 } thread_param;
-
 
 void *threadwork(void *param)
 {
     static const double c_cdir = 0.25 * M_SQRT2 / (M_SQRT2 + 1.0);
     static const double c_cdiag = 0.25 / (M_SQRT2 + 1.0);
+
     /* Get all values from parameter struct */
-    thread_param *thread_parameters = (thread_param*) param;
+    thread_param *thread_parameters = (thread_param *)param;
     size_t i, j, iter;
     struct timeval *before = thread_parameters->before;
     struct timeval *after = thread_parameters->after;
@@ -42,9 +43,9 @@ void *threadwork(void *param)
     int h = thread_parameters->parameters->N + 2;
     int w = thread_parameters->parameters->M + 2;
     int print_reports = thread_parameters->parameters->printreports;
-    double (*restrict c)[h][w] = thread_parameters->cond;
-    double (*restrict src)[h][w] = thread_parameters->src;
-    double (*restrict dst)[h][w] = thread_parameters->dst;
+    double(*restrict c)[h][w] = thread_parameters->cond;
+    double(*restrict src)[h][w] = thread_parameters->src;
+    double(*restrict dst)[h][w] = thread_parameters->dst;
     int start_row = thread_parameters->row_start;
     int end_row = thread_parameters->row_end;
     iter = thread_parameters->iter;
@@ -52,14 +53,18 @@ void *threadwork(void *param)
     for (iter = 1; iter <= maxiter; ++iter)
     {
         /* swap source and destination */
-        { void *tmp = src; src = dst; dst = tmp; }
+        {
+            void *tmp = src;
+            src = dst;
+            dst = tmp;
+        }
 
         /* initialize halo on source */
         do_copy(h, w, src);
 
-        double maxdiff = 0.0;
+        double local_maxdiff = 0.0;
 
-        // pthread_barrier_wait(&barrier);
+        pthread_barrier_wait(&barrier);
         /* compute */
         for (i = start_row; i < end_row; ++i)
             for (j = 1; j < w - 1; ++j)
@@ -69,33 +74,51 @@ void *threadwork(void *param)
 
                 (*dst)[i][j] = w * (*src)[i][j] +
 
-                    ((*src)[i+1][j  ] + (*src)[i-1][j  ] +
-                     (*src)[i  ][j+1] + (*src)[i  ][j-1]) * (restw * c_cdir) +
+                               ((*src)[i + 1][j] + (*src)[i - 1][j] +
+                                (*src)[i][j + 1] + (*src)[i][j - 1]) *
+                                   (restw * c_cdir) +
 
-                    ((*src)[i-1][j-1] + (*src)[i-1][j+1] +
-                     (*src)[i+1][j-1] + (*src)[i+1][j+1]) * (restw * c_cdiag);
+                               ((*src)[i - 1][j - 1] + (*src)[i - 1][j + 1] +
+                                (*src)[i + 1][j - 1] + (*src)[i + 1][j + 1]) *
+                                   (restw * c_cdiag);
 
                 double diff = fabs((*dst)[i][j] - (*src)[i][j]);
-                if (diff > maxdiff) maxdiff = diff;
+                if (diff > local_maxdiff)
+                    local_maxdiff = diff;
             }
-           thread_parameters->results->maxdiff=maxdiff;
-        if(maxdiff < thread_parameters->parameters->threshold){iter++;break;}
+        /*Store local maxdiff and wait for other threads to store theirs */
+        thread_parameters->maxdiff_locals[thread_parameters->id] = local_maxdiff;
+        pthread_barrier_wait(&barrier);
+
         /* conditional reporting */
-        if (thread_parameters->id == 0) printf("thread %d iter = %d\n",thread_parameters->id, iter);
-        if (thread_parameters->id == 0 && iter % thread_parameters->parameters->period == 0) {
-           fill_report(thread_parameters->parameters, thread_parameters->results, h, w, dst, src, iter, thread_parameters->before);
-            if(thread_parameters->parameters->printreports) report_results(thread_parameters->parameters, thread_parameters->results);
+        if (thread_parameters->id == 0)
+        {
+            double maxdiff = 0.0;
+            /* Calculate maxdiff */
+            for (int proc = 0; proc < num_threads; proc++)
+            {
+                if (thread_parameters->maxdiff_locals[proc] > maxdiff)
+                {
+                    maxdiff = thread_parameters->maxdiff_locals[proc];
+                }
+            }
+
+            thread_parameters->results->maxdiff = maxdiff;
+
+            if (iter % thread_parameters->parameters->period == 0)
+            {
+                fill_report(thread_parameters->parameters, thread_parameters->results, h, w, dst, src, iter, thread_parameters->before);
+                if (thread_parameters->parameters->printreports)
+                    report_results(thread_parameters->parameters, thread_parameters->results);
+            }
         }
-        //#ifdef GEN_PICTURES
-        //do_draw(p, iter, h, w, src);
-        //#endif
     }
 }
 
 void do_compute(const struct parameters *p, struct results *r)
 {
     size_t i, j;
-    int num_threads = p->nthreads;
+    num_threads = p->nthreads;
 
     /* alias input parameters */
     const double(*restrict tinit)[p->N][p->M] = (const double(*)[p->N][p->M])p->tinit;
@@ -114,6 +137,8 @@ void do_compute(const struct parameters *p, struct results *r)
 
     static const double c_cdir = 0.25 * M_SQRT2 / (M_SQRT2 + 1.0);
     static const double c_cdiag = 0.25 / (M_SQRT2 + 1.0);
+
+    double *maxdiff_locals = malloc(sizeof(double) * num_threads);
 
     /* set initial temperatures and conductivities */
     for (i = 1; i < h - 1; ++i)
@@ -140,7 +165,10 @@ void do_compute(const struct parameters *p, struct results *r)
     /* Determine split size of grid over threads */
     int rows_per_threads[num_threads];
     int row_count = (h - 2) / num_threads;
-    for (int i = 0; i < num_threads; i++) { rows_per_threads[i] = row_count; }
+    for (int i = 0; i < num_threads; i++)
+    {
+        rows_per_threads[i] = row_count;
+    }
     int rest = (h - 2) - (num_threads * row_count);
     int fill_rest_thread = 0;
     while (rest != 0)
@@ -162,8 +190,6 @@ void do_compute(const struct parameters *p, struct results *r)
     }
 
     pthread_t pthreads[num_threads];
-    pthread_barrierattr_t attr;
-    unsigned count;
     int ret;
     ret = pthread_barrier_init(&barrier, NULL, num_threads);
 
@@ -183,6 +209,7 @@ void do_compute(const struct parameters *p, struct results *r)
         current_params->src = (double **)src;
         current_params->dst = (double **)dst;
         current_params->iter = &iter;
+        current_params->maxdiff_locals = maxdiff_locals;
 
         pthread_create(&pthreads[proc], NULL, threadwork, current_params);
     }
@@ -193,14 +220,11 @@ void do_compute(const struct parameters *p, struct results *r)
         if (pthread_join(pthreads[proc], NULL))
         {
             fprintf(stderr, "Error joining thread\n");
-            /* TODO returns status exit */
         }
     }
 
     /* report at end in all cases */
-     iter = p->maxiter;
-    // iter--;
-    // printf("iter = %d\n", iter);
+    iter = p->maxiter;
     fill_report(p, r, h, w, dst, src, iter, &before);
 
     free(c);
