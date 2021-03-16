@@ -25,18 +25,20 @@ static void checkCudaCall(cudaError_t result) {
 }
 
 
-__global__ void histogramKernel(unsigned char* image, long img_size, unsigned int* histogram, int hist_size) {
+__global__ void histogramKernel(unsigned char* image, long img_size, unsigned int* histogram, int hist_size, int stride) {
 // insert operation here
-    unsigned int tid = threadIdx.x + blockDim.x * blockIdx.x;
+    unsigned int tid = threadIdx.x * stride + blockDim.x * blockIdx.x * stride;
     //printf("Hello from block me, global_thread %d\n", threadIdx.x + blockDim.x * blockIdx.x);
-    if (tid < img_size){
-        atomicAdd(&histogram[image[tid]], 1);
+    for (int i = tid; i < tid + stride; i ++){       
+        if (i < img_size){
+            atomicAdd(&histogram[image[i]], 1);
+        }
     }
 }
 
 void histogramCuda(unsigned char* image, long img_size, unsigned int* histogram, int hist_size) {
     int threadBlockSize = 512;
-
+    int stride = 100;
     // allocate the vectors on the GPU
     unsigned char* deviceImage = NULL;
     checkCudaCall(cudaMalloc((void **) &deviceImage, img_size * sizeof(unsigned char)));
@@ -62,7 +64,7 @@ void histogramCuda(unsigned char* image, long img_size, unsigned int* histogram,
 
     // execute kernel
     kernelTime1.start();
-    histogramKernel<<<img_size/threadBlockSize, threadBlockSize>>>(deviceImage, img_size, deviceHisto, hist_size);
+    histogramKernel<<<img_size/threadBlockSize/stride + 1, threadBlockSize>>>(deviceImage, img_size, deviceHisto, hist_size, stride);
     cudaDeviceSynchronize();
     kernelTime1.stop();
 
